@@ -36,6 +36,9 @@ public class Player {
 	}
 	
 	public void privateMessage(String s){
-		
+		if(!user.hasPrivateChannel()){
+			user.openPrivateChannel().queue();
+		}
+		user.getPrivateChannel().sendMessage(s).queue();
 	}
 }
