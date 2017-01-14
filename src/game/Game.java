@@ -44,6 +44,12 @@ public class Game {
 		channel.sendMessage(s).queue();
 	}
 	
+	/**Sends a private message to the given player.*/
+	public void privateMessage(Player p, String s){
+		
+	}
+	
+	/**Returns the current state of the game.*/
 	public State getState(){
 		return state;
 	}
