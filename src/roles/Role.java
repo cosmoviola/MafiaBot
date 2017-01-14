@@ -12,4 +12,8 @@ public abstract class Role {
 
 	public abstract void doAction(Game g);
 	
+	public void setActor(Player p){
+		actor = p;
+	}
+	
 }
