@@ -9,6 +9,7 @@ public class Player {
 	private User user;
 	private Role role;
 	private Alignment alignment;
+	private boolean isAlive = true;
 	
 	public Player(User u){
 		user = u;
@@ -20,5 +21,21 @@ public class Player {
 	
 	public void setAlignment(Alignment a){
 		alignment = a;
+	}
+	
+	public String getName(){
+		return user.getName();
+	}
+	
+	public boolean isAlive(){
+		return isAlive;
+	}
+	
+	public boolean isCop(){
+		return alignment.equals(Alignment.COP);
+	}
+	
+	public void privateMessage(String s){
+		
 	}
 }
