@@ -1,8 +1,11 @@
 package game;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
+import roles.*;
 
 public class Game {
 	
@@ -11,6 +14,8 @@ public class Game {
 	private HashMap<User, Player> players;
 	private TextChannel channel;
 	private int cycle = 0;
+	private ArrayList<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority
+	private final int GAME_SIZE = 5;
 	
 	/**Initialize a game of c5*/
 	public Game(TextChannel c){
@@ -36,7 +41,26 @@ public class Game {
 	}
 	
 	public void beginGame(){
-		
+		c5roles();
+		ArrayList<Player> shufflePlayers = new ArrayList<Player>(players.values());
+		Collections.shuffle(shufflePlayers);
+		for(int i=0; i<GAME_SIZE; i++){
+			Role r = roles.get(i);
+			Player p = shufflePlayers.get(i);
+			p.setRole(r);
+			r.setActor(p);
+			p.privateMessage(r.roleMessage());
+			p.privateMessage(r.winCondition());
+		}
+	}
+	
+	/**Initialize game to use the roles in a c5 game.*/
+	public void c5roles(){
+		roles.add(new Wolf());
+		roles.add(new SaneCop());
+		roles.add(new InsaneCop());
+		roles.add(new NaiveCop());
+		roles.add(new ParanoidCop());
 	}
 	
 	/**Send a message to the text channel this game is taking place in.*/

@@ -19,4 +19,15 @@ public class SaneCop extends Role {
 		}
 	}
 	
+	@Override
+	public String roleMessage() {
+		return "You are a cop. At night, message me !check <user> to determine user's alignment. "
+				+ "Be warned: you do not know your sanity."; 
+	}
+	
+	@Override
+	public String winCondition() {
+		return "You win when the wolf is dead.";
+	}
+	
 }

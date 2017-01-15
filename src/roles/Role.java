@@ -16,4 +16,8 @@ public abstract class Role {
 		actor = p;
 	}
 	
+	public abstract String roleMessage();
+	
+	public abstract String winCondition();
+	
 }
