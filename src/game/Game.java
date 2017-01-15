@@ -10,7 +10,7 @@ public class Game {
 	private State state;
 	private HashMap<User, Player> players;
 	private TextChannel channel;
-	private int cycleNumber = 0;
+	private int cycle = 0;
 	
 	/**Initialize a game of c5*/
 	public Game(TextChannel c){
@@ -47,5 +47,10 @@ public class Game {
 	/**Returns the current state of the game.*/
 	public State getState(){
 		return state;
+	}
+	
+	/**Returns the current cycle of the game.*/
+	public int getCycle(){
+		return cycle;
 	}
 }
