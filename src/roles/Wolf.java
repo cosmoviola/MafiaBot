@@ -9,7 +9,7 @@ public class Wolf extends Role {
 		if(g.getState().equals(Game.State.NIGHT)&&actor.isAlive()){
 			if(actor.isHooked()){
 				actor.privateMessage("Your action failed as you were hooked.");
-			}else{
+			}else if(target!=null){
 				if(g.getCycle()==0){
 					target.hook();
 				}else{
