@@ -41,4 +41,8 @@ public class Player {
 		}
 		user.getPrivateChannel().sendMessage(s).queue();
 	}
+	
+	public void kill(){
+		isAlive = false;
+	}
 }
