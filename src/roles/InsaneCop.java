@@ -6,7 +6,7 @@ public class InsaneCop extends Role {
 
 	@Override
 	public void doAction(Game g) {
-		if(g.getState().equals(Game.State.NIGHT)&&actor.isAlive()){
+		if(g.getState().equals(Game.State.NIGHT)&&actor.isAlive()&&!actor.isHooked()){
 			if(target.isCop()){
 				actor.privateMessage(target.getName()+wolfResult);
 			}else{

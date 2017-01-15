@@ -10,6 +10,7 @@ public class Player {
 	private Role role;
 	private Alignment alignment;
 	private boolean isAlive = true;
+	private boolean hooked = false;
 	
 	public Player(User u){
 		user = u;
@@ -31,6 +32,10 @@ public class Player {
 		return isAlive;
 	}
 	
+	public boolean isHooked(){
+		return hooked;
+	}
+	
 	public boolean isCop(){
 		return alignment.equals(Alignment.COP);
 	}
@@ -44,5 +49,9 @@ public class Player {
 	
 	public void kill(){
 		isAlive = false;
+	}
+	
+	public void hook(){
+		hooked = true;
 	}
 }
