@@ -22,6 +22,7 @@ public class Game {
 	private final int GAME_SIZE = 5;
 	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
 	private ScheduledFuture currentTimer;
+	private HashMap<User, User> votes = new HashMap<User, User>(); //first user is voter, second is voted for
 	
 	/**Initialize a game of c5*/
 	public Game(TextChannel c){
@@ -92,7 +93,47 @@ public class Game {
 	
 	/**Begin the next day.*/
 	private void beginDay(){
-		
+		cycle++;
+		state=State.DAY;
+		postMessage("It is now Day "+cycle+". "
+				+ "Vote for a player to lynch by submitting !vote <user> in this channel. "
+				+ "You have 30 seconds.");
+		currentTimer = timerExecutor.schedule(new Runnable(){
+			public @Override void run() {
+				endDay();
+			}
+		}, 30, TimeUnit.SECONDS);
+	}
+	
+	/**End the day. Resolves the lynch.*/
+	private void endDay(){
+		postMessage("The voting period has ended.");
+		HashMap<User, Integer> tally = new HashMap<User, Integer>();
+		for(User e:votes.values()){
+			if(tally.containsKey(e)){
+				tally.put(e, tally.get(e)+1);
+			}else{
+				tally.put(e, 1);
+			}
+		}
+		int max = 0;
+		User currentLynch = null;
+		for(User e: tally.keySet()){
+			int current = tally.get(e);
+			if(max<current){
+				max = current;
+				currentLynch = e;
+			}else if(max==current){
+				currentLynch = null;
+			}
+		}
+		if(currentLynch == null){
+			postMessage("No one was lynched.");
+		}else{
+			postMessage(currentLynch.getDiscriminator()+" was lynched. "
+					+ "He was a "+players.get(currentLynch).getRole().cardFlip()+".");
+		}
+		beginNight();
 	}
 	
 	/**Initialize game to use the roles in a c5 game.*/
