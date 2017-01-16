@@ -14,6 +14,8 @@ public class Wolf extends Role {
 					target.hook();
 				}else{
 					target.kill();
+					g.postMessage(target.getDiscriminator()+" has been killed. "
+							+ "They were a "+target.getRole().cardFlip()+".");
 				}
 			}
 		}
@@ -28,5 +30,10 @@ public class Wolf extends Role {
 	@Override
 	public String winCondition() {
 		return "You win when you are the last player standing.";
+	}
+	
+	@Override
+	public String cardFlip() {
+		return "Wolf";
 	}
 }

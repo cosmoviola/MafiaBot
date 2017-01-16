@@ -20,4 +20,6 @@ public abstract class Role {
 	
 	public abstract String winCondition();
 	
+	public abstract String cardFlip();
+	
 }

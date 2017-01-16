@@ -2,6 +2,10 @@ package game;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -16,6 +20,8 @@ public class Game {
 	private int cycle = 0;
 	private ArrayList<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority
 	private final int GAME_SIZE = 5;
+	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
+	private ScheduledFuture currentTimer;
 	
 	/**Initialize a game of c5*/
 	public Game(TextChannel c){
@@ -40,7 +46,9 @@ public class Game {
 		}	
 	}
 	
-	public void beginGame(){
+	/**Set up game and assign roles. Begin the first night.*/
+	private void beginGame(){
+		//role assignment
 		c5roles();
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(players.values());
 		Collections.shuffle(shufflePlayers);
@@ -52,6 +60,39 @@ public class Game {
 			p.privateMessage(r.roleMessage());
 			p.privateMessage(r.winCondition());
 		}
+		
+		String message = "The game begins. The players are:";
+		for(User u: players.keySet()){
+			message+=" "+u.getDiscriminator();
+		}
+		postMessage(message+".");
+		beginNight();
+	}
+	
+	/**Begin a night.*/
+	private void beginNight(){
+		state=State.NIGHT;
+		postMessage("It is now Night "+cycle+". The night ends in 30 seconds or when all actions are in.");
+		currentTimer = timerExecutor.schedule(new Runnable(){
+			public @Override void run() {
+				endNight();
+			}
+		}, 30, TimeUnit.SECONDS);
+	}
+	
+	/**End a night. Resolves all actions placed.*/
+	private void endNight(){
+		postMessage("The night has ended.");
+		Iterator<Role> i = roles.iterator();
+		while(i.hasNext()){
+			i.next().doAction(this);
+		}
+		beginDay();
+	}
+	
+	/**Begin the next day.*/
+	private void beginDay(){
+		
 	}
 	
 	/**Initialize game to use the roles in a c5 game.*/
@@ -76,5 +117,11 @@ public class Game {
 	/**Returns the current cycle of the game.*/
 	public int getCycle(){
 		return cycle;
+	}
+	
+	/**Attempts to cancel the current timer for a day or night. 
+	 * If false is returned, the timer could not be stopped.*/
+	public boolean cancelTimer(){
+		return currentTimer.cancel(false);
 	}
 }

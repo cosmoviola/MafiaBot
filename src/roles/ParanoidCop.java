@@ -10,7 +10,7 @@ public class ParanoidCop extends Role {
 			if(actor.isHooked()){
 				actor.privateMessage("Your action failed as you were hooked.");
 			}else if(target!=null){
-				actor.privateMessage(target.getName()+wolfResult);
+				actor.privateMessage(target.getDiscriminator()+wolfResult);
 			}
 		}
 	}
@@ -25,5 +25,9 @@ public class ParanoidCop extends Role {
 	public String winCondition() {
 		return "You win when the wolf is dead.";
 	}
-	
+
+	@Override
+	public String cardFlip() {
+		return "Cop";
+	}		
 }

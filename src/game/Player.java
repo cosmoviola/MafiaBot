@@ -20,12 +20,16 @@ public class Player {
 		role = r;
 	}
 	
+	public Role getRole(){
+		return role;
+	}
+	
 	public void setAlignment(Alignment a){
 		alignment = a;
 	}
 	
-	public String getName(){
-		return user.getName();
+	public String getDiscriminator(){
+		return user.getDiscriminator();
 	}
 	
 	public boolean isAlive(){

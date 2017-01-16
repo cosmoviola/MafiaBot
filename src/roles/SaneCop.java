@@ -11,9 +11,9 @@ public class SaneCop extends Role {
 				actor.privateMessage("Your action failed as you were hooked.");
 			}else if(target!=null){
 				if(target.isCop()){
-					actor.privateMessage(target.getName()+copResult);
+					actor.privateMessage(target.getDiscriminator()+copResult);
 				}else{
-					actor.privateMessage(target.getName()+wolfResult);
+					actor.privateMessage(target.getDiscriminator()+wolfResult);
 				}
 			}
 		}
@@ -29,5 +29,9 @@ public class SaneCop extends Role {
 	public String winCondition() {
 		return "You win when the wolf is dead.";
 	}
-	
+
+	@Override
+	public String cardFlip() {
+		return "Cop";
+	}
 }
