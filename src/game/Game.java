@@ -163,6 +163,26 @@ public class Game {
 		votes.put(voter, voted);
 	}
 	
+	/**Takes commands in the main text channel and executes them.*/
+	public void executeCommand(String[] cmd, User author){
+		switch(cmd[1]){
+			case "join":
+				addPlayer(author);
+				break;
+			case "vote":
+				if(cmd.length<3){
+					postMessage("Vote command must have a target.");
+					break;
+				}
+				String target = cmd[2];
+				if(names.containsKey(target)){
+					placeVote(author, names.get(target));
+				}else{
+					placeVote(author, null);
+				}
+		}	
+	}
+	
 	/**Initialize game to use the roles in a c5 game.*/
 	public void c5roles(){
 		roles.add(new Wolf());
