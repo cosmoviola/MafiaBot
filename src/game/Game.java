@@ -16,6 +16,7 @@ public class Game {
 	public static enum State {JOINING, DAY, NIGHT};
 	private State state;
 	private HashMap<User, Player> players;
+	private HashMap<String, User> names; //gets a user from the user's discriminator
 	private int playerCount = 0;
 	private TextChannel channel;
 	private int cycle = 0;
@@ -46,6 +47,7 @@ public class Game {
 			if(players.containsKey(u)){
 				postMessage(u.getName()+" has already joined this game.");
 			}else{
+				names.put(u.getDiscriminator(), u);
 				players.put(u, new Player(u));
 				playerCount++;
 				postMessage(u.getName()+" has joined the game. "
@@ -154,6 +156,11 @@ public class Game {
 					+ "He was a "+players.get(currentLynch).getRole().cardFlip()+".");
 		}
 		beginNight();
+	}
+	
+	/**Places a vote by voter onto voted.*/
+	private void placeVote(User voter, User voted){
+		votes.put(voter, voted);
 	}
 	
 	/**Initialize game to use the roles in a c5 game.*/
