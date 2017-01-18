@@ -160,7 +160,16 @@ public class Game {
 	
 	/**Places a vote by voter onto voted.*/
 	private void placeVote(User voter, User voted){
-		votes.put(voter, voted);
+		if(getState()==State.DAY){
+			votes.put(voter, voted);
+		}
+	}
+	
+	/**Removes a vote placed by a user.*/
+	private void removeVote(User voter){
+		if(getState()==State.DAY){
+			votes.remove(voter);
+		}
 	}
 	
 	/**Takes commands in the main text channel and executes them.*/
@@ -180,6 +189,10 @@ public class Game {
 				}else{
 					placeVote(author, null);
 				}
+				break;
+			case "unvote":
+				removeVote(author);
+				break;
 		}	
 	}
 	
