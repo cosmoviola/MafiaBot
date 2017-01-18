@@ -16,6 +16,7 @@ public class Game {
 	public static enum State {JOINING, DAY, NIGHT};
 	private State state;
 	private HashMap<User, Player> players;
+	private int playerCount = 0;
 	private TextChannel channel;
 	private int cycle = 0;
 	private ArrayList<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority
@@ -29,6 +30,11 @@ public class Game {
 		channel = c;
 		state = State.JOINING;
 		players = new HashMap<User, Player>(7);
+		currentTimer = timerExecutor.schedule(new Runnable(){
+			public @Override void run() {
+				cancelSetup();
+			}
+		}, 60, TimeUnit.SECONDS);
 	}
 	
 	/**Adds a User to this game if game is in the JOINING state and the User has not joined yet.
@@ -41,14 +47,28 @@ public class Game {
 				postMessage(u.getName()+" has already joined this game.");
 			}else{
 				players.put(u, new Player(u));
+				playerCount++;
+				postMessage(u.getName()+" has joined the game. "
+							+(GAME_SIZE-playerCount)+" players still needed.");
 			}
 		}else{
 			postMessage("This game is not accepting players at this time.");
-		}	
+		}
+		if(playerCount==GAME_SIZE){
+			postMessage("Enough players have joined the game. Game starting.");
+			beginGame();
+		}
+	}
+	
+	/**Ends game if not enough people joined in time during the JOINING state.*/
+	private void cancelSetup(){
+		postMessage("Not enough people joined.");
+		C5Bot.removeGame(channel);
 	}
 	
 	/**Set up game and assign roles. Begin the first night.*/
 	private void beginGame(){
+		cancelTimer();
 		//role assignment
 		c5roles();
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(players.values());
