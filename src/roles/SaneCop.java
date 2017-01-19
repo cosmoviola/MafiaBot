@@ -34,4 +34,10 @@ public class SaneCop extends Role {
 	public String cardFlip() {
 		return "Cop";
 	}
+
+	@Override
+	public String[] getCommands() {
+		String[] s = {"check"};
+		return s;
+	}
 }

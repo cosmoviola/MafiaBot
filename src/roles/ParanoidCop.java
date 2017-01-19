@@ -29,5 +29,11 @@ public class ParanoidCop extends Role {
 	@Override
 	public String cardFlip() {
 		return "Cop";
-	}		
+	}
+
+	@Override
+	public String[] getCommands() {
+		String[] s = {"check"};
+		return s;
+	}	
 }

@@ -36,4 +36,10 @@ public class Wolf extends Role {
 	public String cardFlip() {
 		return "Wolf";
 	}
+
+	@Override
+	public String[] getCommands() {
+		String[] s = {"hook", "kill"};
+		return s;
+	}
 }

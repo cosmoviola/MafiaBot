@@ -22,4 +22,6 @@ public abstract class Role {
 	
 	public abstract String cardFlip();
 	
+	public abstract String[] getCommands();
+	
 }
