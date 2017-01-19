@@ -17,7 +17,7 @@ public class C5Bot extends ListenerAdapter{
 	/**Creates an instance of JDA*/
 	public static void main(String[] args) {
 		if(args.length!=1){
-			System.out.println("Usage: java -jar MemeBot.jar token");
+			System.out.println("Usage: java -jar C5Bot.jar token");
 			System.exit(1);
 		}
 		token = args[0];
