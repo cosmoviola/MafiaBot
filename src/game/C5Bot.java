@@ -47,6 +47,8 @@ public class C5Bot extends ListenerAdapter{
 					games.put(channel, g);
 					g.addPlayer(m.getAuthor());
 				}
+			}else{
+				games.get(channel).executeCommand(words, m.getAuthor());
 			}
 		}
 	}

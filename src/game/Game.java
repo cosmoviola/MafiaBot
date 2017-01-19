@@ -31,6 +31,7 @@ public class Game {
 		channel = c;
 		state = State.JOINING;
 		players = new HashMap<User, Player>(7);
+		names = new HashMap<String, User>(7);
 		currentTimer = timerExecutor.schedule(new Runnable(){
 			public @Override void run() {
 				cancelSetup();
@@ -191,6 +192,7 @@ public class Game {
 				addPlayer(author);
 				break;
 			case "leave":
+				removePlayer(author);
 				break;
 			case "vote":
 				if(cmd.length<3){
@@ -206,6 +208,9 @@ public class Game {
 				break;
 			case "unvote":
 				removeVote(author);
+				break;
+			default:
+				postMessage("Unrecognized command.");
 				break;
 		}	
 	}
