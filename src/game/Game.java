@@ -40,7 +40,6 @@ public class Game {
 	
 	/**Adds a User to this game if game is in the JOINING state and the User has not joined yet.
 	 * When game is full, begins the game.
-	 * @param u
 	 */
 	public void addPlayer(User u){
 		if(state.equals(State.JOINING)){
@@ -51,14 +50,27 @@ public class Game {
 				players.put(u, new Player(u));
 				playerCount++;
 				postMessage(u.getName()+" has joined the game. "
-							+(GAME_SIZE-playerCount)+" players still needed.");
+						+(GAME_SIZE-playerCount)+" players still needed.");
+			}
+			if(playerCount==GAME_SIZE){
+				postMessage("Enough players have joined the game. Game starting.");
+				beginGame();
 			}
 		}else{
 			postMessage("This game is not accepting players at this time.");
 		}
-		if(playerCount==GAME_SIZE){
-			postMessage("Enough players have joined the game. Game starting.");
-			beginGame();
+	}
+	
+	/**Removes the given user from the game if game is in the JOINING state and the User has joined.*/
+	public void removePlayer(User u){
+		if(state.equals(State.JOINING)){
+			if(players.containsKey(u)){
+				players.remove(u);
+				names.remove(u.getDiscriminator());
+				playerCount--;
+				postMessage(u.getName()+" has left the game. "
+							+(GAME_SIZE-playerCount)+" players needed.");
+			}
 		}
 	}
 	
@@ -177,6 +189,8 @@ public class Game {
 		switch(cmd[1]){
 			case "join":
 				addPlayer(author);
+				break;
+			case "leave":
 				break;
 			case "vote":
 				if(cmd.length<3){
