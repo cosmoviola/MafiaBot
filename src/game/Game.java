@@ -7,6 +7,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import alignments.Alignment;
+import alignments.Self;
+import alignments.Village;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import roles.*;
@@ -21,8 +24,9 @@ public class Game {
 	private TextChannel channel;
 	private String id; //identifier of TextChannel game takes place in
 	private int cycle = 0;
-	private ArrayList<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority
-	private final int GAME_SIZE = 5;
+	private ArrayList<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority. These are where actions are executed.
+	private ArrayList<RoleAlignmentPair> pairsToAssign = new ArrayList<RoleAlignmentPair>(); //these are to be assigned to players
+	private final int GAME_SIZE = 5; //final because this is c5.
 	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
 	private ScheduledFuture currentTimer;
 	private HashMap<User, User> votes = new HashMap<User, User>(); //first user is voter, second is voted for
@@ -91,10 +95,14 @@ public class Game {
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(players.values());
 		Collections.shuffle(shufflePlayers);
 		for(int i=0; i<GAME_SIZE; i++){
-			Role r = roles.get(i);
+			RoleAlignmentPair pair = pairsToAssign.get(i);
+			Role r = pair.getRole();
+			Alignment a = pair.getAlignment();
 			Player p = shufflePlayers.get(i);
 			p.setRole(r);
+			p.setAlignment(a);
 			r.setActor(p);
+			a.addPlayer(p);
 			p.privateMessage(r.roleMessage());
 			p.privateMessage(r.winCondition());
 		}
@@ -247,6 +255,11 @@ public class Game {
 		roles.add(new InsaneCop(id));
 		roles.add(new NaiveCop(id));
 		roles.add(new ParanoidCop(id));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(1), new Village("cop")));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(2), new Village("cop")));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(3), new Village("cop")));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(4), new Village("cop")));
 	}
 	
 	/**Send a message to the text channel this game is taking place in.*/
@@ -268,5 +281,24 @@ public class Game {
 	 * If false is returned, the timer could not be stopped.*/
 	public boolean cancelTimer(){
 		return currentTimer.cancel(false);
+	}
+	
+	private class RoleAlignmentPair{
+		
+		Role role;
+		Alignment alignment;
+		
+		public RoleAlignmentPair(Role r, Alignment a){
+			role = r;
+			alignment = a;
+		}
+		
+		public Role getRole(){
+			return role;
+		}
+		
+		public Alignment getAlignment(){
+			return alignment;
+		}
 	}
 }

@@ -1,10 +1,9 @@
 package game;
+import alignments.Alignment;
 import net.dv8tion.jda.core.entities.User;
 import roles.Role;
 
 public class Player {
-	
-	public enum Alignment {COP, WOLF};
 	
 	private User user;
 	private Role role;
@@ -40,8 +39,12 @@ public class Player {
 		return hooked;
 	}
 	
+	public Alignment getAlignment(){
+		return alignment;
+	}
+	
 	public boolean isCop(){
-		return alignment.equals(Alignment.COP);
+		return alignment.equals(Alignment.getAlignment("cop"));
 	}
 	
 	public void privateMessage(String s){
