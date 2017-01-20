@@ -27,6 +27,11 @@ public abstract class Role {
 		target = p;
 	}
 	
+	/**Prepares the role for the next cycle by resetting the target to null.*/
+	public void resetTarget(){
+		target = null;
+	}
+	
 	public abstract String roleMessage();
 	
 	public abstract String winCondition();

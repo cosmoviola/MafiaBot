@@ -125,6 +125,10 @@ public class Game {
 		while(i.hasNext()){
 			i.next().doAction(this);
 		}
+		i = roles.iterator();
+		while(i.hasNext()){ //this is a separate loop in case a target is needed for another role.
+			i.next().resetTarget();
+		}
 		beginDay();
 	}
 	
