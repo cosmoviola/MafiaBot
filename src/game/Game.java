@@ -174,6 +174,7 @@ public class Game {
 			postMessage(currentLynch.getDiscriminator()+" was lynched. "
 					+ "He was a "+players.get(currentLynch).getRole().cardFlip()+".");
 		}
+		votes.clear();
 		beginNight();
 	}
 	
