@@ -1,9 +1,15 @@
 package roles;
 
+import java.util.HashSet;
+
 import game.Game;
 
 public class SaneCop extends Role {
 
+	public SaneCop(String id) {
+		super(id);
+	}
+	
 	@Override
 	public void doAction(Game g) {
 		if(g.getState().equals(Game.State.NIGHT)&&actor.isAlive()){
@@ -21,7 +27,7 @@ public class SaneCop extends Role {
 	
 	@Override
 	public String roleMessage() {
-		return "You are a cop. At night, message me !check <user> to determine user's alignment. "
+		return "You are a cop. At night, message me "+id+" check <user> to determine user's alignment. "
 				+ "Be warned: you do not know your sanity."; 
 	}
 	
@@ -36,8 +42,9 @@ public class SaneCop extends Role {
 	}
 
 	@Override
-	public String[] getCommands() {
-		String[] s = {"check"};
+	public HashSet<String> getCommands() {
+		HashSet<String> s = new HashSet<String>();
+		s.add("check");
 		return s;
 	}
 }

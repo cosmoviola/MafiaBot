@@ -1,8 +1,14 @@
 package roles;
 
+import java.util.HashSet;
+
 import game.Game;
 
 public class Wolf extends Role {
+
+	public Wolf(String id) {
+		super(id);
+	}
 
 	@Override
 	public void doAction(Game g) {
@@ -23,8 +29,8 @@ public class Wolf extends Role {
 
 	@Override
 	public String roleMessage() {
-		return "You are the wolf. At night on cycle 0, message me !hook <user> to hook user. "
-				+ "On following nights, message me !kill <user> to kill user.";
+		return "You are the wolf. At night on cycle 0, message me "+id+" hook <user> to hook user. "
+				+ "On following nights, message me "+id+" kill <user> to kill user.";
 	}
 
 	@Override
@@ -38,8 +44,10 @@ public class Wolf extends Role {
 	}
 
 	@Override
-	public String[] getCommands() {
-		String[] s = {"hook", "kill"};
+	public HashSet<String> getCommands() {
+		HashSet<String> s = new HashSet<String>();
+		s.add("hook");
+		s.add("kill");
 		return s;
 	}
 }

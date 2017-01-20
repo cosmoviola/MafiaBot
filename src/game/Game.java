@@ -19,6 +19,7 @@ public class Game {
 	private HashMap<String, User> names; //gets a user from the user's discriminator
 	private int playerCount = 0;
 	private TextChannel channel;
+	private String id; //identifier of TextChannel game takes place in
 	private int cycle = 0;
 	private ArrayList<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority
 	private final int GAME_SIZE = 5;
@@ -29,6 +30,7 @@ public class Game {
 	/**Initialize a game of c5*/
 	public Game(TextChannel c){
 		channel = c;
+		id = c.getId();
 		state = State.JOINING;
 		players = new HashMap<User, Player>(7);
 		names = new HashMap<String, User>(7);
@@ -186,7 +188,7 @@ public class Game {
 	}
 	
 	/**Takes commands in the main text channel and executes them.*/
-	public void executeCommand(String[] cmd, User author){
+	public void executeChannelCommand(String[] cmd, User author){
 		switch(cmd[1]){
 			case "join":
 				addPlayer(author);
@@ -215,13 +217,31 @@ public class Game {
 		}	
 	}
 	
+	/**Executes the command contained in cmd. 
+	 * In a later implementation, commands will fetch an Action object, which will determine
+	 * what action is done. For now, all commands have the same effect.
+	 */
+	public void executePrivateCommand(String[] cmd, User author){
+		Player executor = players.get(author);
+		Role executorRole = executor.getRole();
+		if(executorRole.getCommands().contains(cmd[1])){
+			if(names.containsKey(cmd[2])){
+				executorRole.setTarget(players.get(names.get(cmd[2])));
+			}else{
+				executorRole.setTarget(null);
+			}
+		}else{
+			executor.privateMessage("That is not a valid command.");
+		}
+	}
+	
 	/**Initialize game to use the roles in a c5 game.*/
 	public void c5roles(){
-		roles.add(new Wolf());
-		roles.add(new SaneCop());
-		roles.add(new InsaneCop());
-		roles.add(new NaiveCop());
-		roles.add(new ParanoidCop());
+		roles.add(new Wolf(id));
+		roles.add(new SaneCop(id));
+		roles.add(new InsaneCop(id));
+		roles.add(new NaiveCop(id));
+		roles.add(new ParanoidCop(id));
 	}
 	
 	/**Send a message to the text channel this game is taking place in.*/

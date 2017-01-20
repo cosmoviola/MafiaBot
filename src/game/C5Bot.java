@@ -7,12 +7,14 @@ import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class C5Bot extends ListenerAdapter{
 
 	private static String token;
 	private static HashMap<TextChannel, Game> games = new HashMap<TextChannel, Game>();
+	private static HashMap<String, TextChannel> channels = new HashMap<String, TextChannel>(); 
 	
 	/**Creates an instance of JDA*/
 	public static void main(String[] args) {
@@ -45,11 +47,22 @@ public class C5Bot extends ListenerAdapter{
 				}else{
 					Game g = new Game(channel);
 					games.put(channel, g);
+					channels.put(channel.getId(), channel);
 					g.addPlayer(m.getAuthor());
 				}
 			}else if(games.containsKey(channel)){
-				games.get(channel).executeCommand(words, m.getAuthor());
+				games.get(channel).executeChannelCommand(words, m.getAuthor());
 			}
+		}
+	}
+	
+	@Override
+	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event){
+		Message m = event.getMessage();
+		String s = m.getContent();
+		String[] words = s.split(" ");
+		if(words.length>=3&&channels.containsKey(words[0])){
+			games.get(channels.get(words[0])).executePrivateCommand(words, event.getAuthor());
 		}
 	}
 	
