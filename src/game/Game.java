@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -21,6 +22,7 @@ public class Game {
 	private State state;
 	private HashMap<User, Player> players;
 	private HashMap<String, User> names; //gets a user from the user's identifier
+	private HashSet<Player> living;
 	private int playerCount = 0;
 	private TextChannel channel;
 	private String id; //identifier of TextChannel game takes place in
@@ -99,6 +101,7 @@ public class Game {
 	private void beginGame(){
 		cancelTimer();
 		//role assignment
+		living = new HashSet<Player>(players.values());
 		c5roles();
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(players.values());
 		Collections.shuffle(shufflePlayers);
@@ -260,6 +263,12 @@ public class Game {
 		return null;
 	}
 	
+	/**Kills player p.*/
+	public void killPlayer(Player p){
+		living.remove(p);
+		p.kill();
+	}
+	
 	/**Takes commands in the main text channel and executes them.*/
 	public void executeChannelCommand(String[] cmd, User author){
 		switch(cmd[1]){
@@ -275,7 +284,7 @@ public class Game {
 					break;
 				}
 				String target = cmd[2];
-				if(names.containsKey(target)){
+				if(names.containsKey(target)&&living.contains(author)){
 					placeVote(author, names.get(target));
 				}else{
 					placeVote(author, null);

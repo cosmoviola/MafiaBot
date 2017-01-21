@@ -19,7 +19,7 @@ public class Wolf extends Role {
 				if(g.getCycle()==0){
 					target.hook();
 				}else{
-					target.kill();
+					g.killPlayer(target);
 					g.postMessage(target.getIdentifier()+" has been killed. "
 							+ "They were a "+target.getRole().cardFlip()+".");
 				}
