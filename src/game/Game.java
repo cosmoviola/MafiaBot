@@ -1,5 +1,6 @@
 package game;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -79,6 +80,11 @@ public class Game {
 							+(GAME_SIZE-playerCount)+" players needed.");
 			}
 		}
+	}
+	
+	/**Gets the Collection of players.*/
+	public Collection<Player> getPlayers(){
+		return players.values();
 	}
 	
 	/**Ends game if not enough people joined in time during the JOINING state.*/

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import game.Game;
 import game.Player;
 
 public abstract class Alignment {
@@ -50,4 +51,7 @@ public abstract class Alignment {
 		}
 		return null;
 	}
+	
+	/**Returs if this faction wins this game.*/
+	public abstract boolean checkVictory(Game g);
 }
