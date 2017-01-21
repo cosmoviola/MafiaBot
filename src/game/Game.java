@@ -316,10 +316,10 @@ public class Game {
 		roles.add(new NaiveCop(id));
 		roles.add(new ParanoidCop(id));
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
-		pairsToAssign.add(new RoleAlignmentPair(roles.get(1), new Village("cop")));
-		pairsToAssign.add(new RoleAlignmentPair(roles.get(2), new Village("cop")));
-		pairsToAssign.add(new RoleAlignmentPair(roles.get(3), new Village("cop")));
-		pairsToAssign.add(new RoleAlignmentPair(roles.get(4), new Village("cop")));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(1), new Village("cops")));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(2), new Village("cops")));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(3), new Village("cops")));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(4), new Village("cops")));
 	}
 	
 	/**Send a message to the text channel this game is taking place in.*/

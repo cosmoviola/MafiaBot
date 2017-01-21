@@ -46,7 +46,7 @@ public class Player {
 	}
 	
 	public boolean isCop(){
-		return alignment.equals(Alignment.getAlignment("cop"));
+		return alignment.equals(Alignment.getAlignment("cops"));
 	}
 	
 	public void openPrivateChannel(){
