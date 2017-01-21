@@ -16,7 +16,12 @@ public class Self extends Alignment {
 				return false;
 			}
 		}
-		return true;
+		for(Player e: this.members){
+			if(e.isAlive()){
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

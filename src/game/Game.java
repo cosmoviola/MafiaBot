@@ -161,7 +161,7 @@ public class Game {
 		cycle++;
 		state=State.DAY;
 		postMessage("It is now Day "+cycle+". "
-				+ "Vote for a player to lynch by submitting !vote <user> in this channel. "
+				+ "Vote for a player to lynch by submitting !c5 vote <user> in this channel. "
 				+ "You have 30 seconds.");
 		currentTimer = timerExecutor.schedule(new Runnable(){
 			public @Override void run() {
@@ -196,6 +196,7 @@ public class Game {
 			postMessage("No one was lynched.");
 		}else{
 			Player p = players.get(currentLynch);
+			killPlayer(p);
 			postMessage(p.getIdentifier()+" was lynched. "
 					+ "He was a "+p.getRole().cardFlip()+".");
 		}
