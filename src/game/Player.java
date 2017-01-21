@@ -47,10 +47,11 @@ public class Player {
 		return alignment.equals(Alignment.getAlignment("cop"));
 	}
 	
+	public void openPrivateChannel(){
+		user.openPrivateChannel();
+	}
+	
 	public void privateMessage(String s){
-		if(!user.hasPrivateChannel()){
-			user.openPrivateChannel().queue();
-		}
 		user.getPrivateChannel().sendMessage(s).queue();
 	}
 	

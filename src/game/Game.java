@@ -55,7 +55,9 @@ public class Game {
 				postMessage(u.getName()+" has already joined this game.");
 			}else{
 				names.put(u.getDiscriminator(), u);
-				players.put(u, new Player(u));
+				Player p = new Player(u);
+				players.put(u, p);
+				p.openPrivateChannel();
 				playerCount++;
 				postMessage(u.getName()+" has joined the game. "
 						+(GAME_SIZE-playerCount)+" players still needed.");
