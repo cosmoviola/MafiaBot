@@ -20,7 +20,7 @@ public class Game {
 	public static enum State {JOINING, DAY, NIGHT};
 	private State state;
 	private HashMap<User, Player> players;
-	private HashMap<String, User> names; //gets a user from the user's discriminator
+	private HashMap<String, User> names; //gets a user from the user's identifier
 	private int playerCount = 0;
 	private TextChannel channel;
 	private String id; //identifier of TextChannel game takes place in
@@ -208,11 +208,27 @@ public class Game {
 	/**Ends the game with Alignment a the victors.*/
 	private void endGame(Alignment a){
 		cancelTimer();
-		String message = a.getName()+"(";
-		for(Player e:a.getMembers()){
-			message+=e.getIdentifier()+", ";
+		String message;
+		Collection c = a.getMembers();
+		Iterator<Player> i = c.iterator();
+		if(c.size()==1){
+			message = i.next().getIdentifier()+" (the "+a.getName()+") has won!";
+		}else if(i.hasNext()==true){
+			boolean next = true;
+			message = "";
+			while(next){
+				Player e = i.next();
+				if(i.hasNext()){
+					message+=e.getIdentifier()+", ";
+				}else{
+					message+="and "+e.getIdentifier();
+					next=false;
+				}
+			}
+			message=" (the "+a.getName()+") have won!";
+		}else{
+			message = "No one wins.";
 		}
-		message=message.substring(0, message.length()-2)+") have won!";
 		postMessage(message);
 		C5Bot.removeGame(channel);
 	}
