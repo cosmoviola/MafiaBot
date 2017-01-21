@@ -1,5 +1,6 @@
 package alignments;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,7 +15,7 @@ public abstract class Alignment {
 	protected static Map<String, Alignment> alignments = new HashMap<String, Alignment>();
 	protected Set<Player> members = new HashSet<Player>();
 	
-	/**Construct an Alignment with name n. Names should be unique and lower case.*/
+	/**Construct an Alignment with name n. Names should be unique.*/
 	public Alignment(String n){
 		name = n;
 		alignments.put(name, this);
@@ -39,6 +40,11 @@ public abstract class Alignment {
 		return name;
 	}
 	
+	/**Returns the Set of Player objects in this alignment.*/
+	public Set<Player> getMembers(){
+		return members;
+	}
+	
 	/**Adds Player p to this Alignment.*/
 	public void addPlayer(Player p){
 		members.add(p);
@@ -50,6 +56,11 @@ public abstract class Alignment {
 			return alignments.get(n);
 		}
 		return null;
+	}
+	
+	/**Returns a Collection containing all alignments in the game.*/
+	public static Collection<Alignment> getAllAlignments(){
+		return alignments.values();
 	}
 	
 	/**Returs if this faction wins this game.*/

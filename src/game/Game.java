@@ -190,6 +190,22 @@ public class Game {
 		}
 		votes.clear();
 		beginNight();
+		Alignment a = checkVictory();
+		if(a!=null){
+			endGame(a);
+		}
+	}
+	
+	/**Ends the game with Alignment a the victors.*/
+	private void endGame(Alignment a){
+		cancelTimer();
+		String message = a.getName()+"(";
+		for(Player e:a.getMembers()){
+			message+=e.getDiscriminator()+", ";
+		}
+		message=message.substring(0, message.length()-2)+") have won!";
+		postMessage(message);
+		C5Bot.removeGame(channel);
 	}
 	
 	/**Places a vote by voter onto voted.*/
@@ -204,6 +220,19 @@ public class Game {
 		if(getState()==State.DAY){
 			votes.remove(voter);
 		}
+	}
+	
+	/**Checks if one of the alignments has won. 
+	 * If so, returns that alignment. Otherwise, returns null.
+	 * This currently does not support multiple alignments winning.*/
+	private Alignment checkVictory(){
+		Collection<Alignment> alignments = Alignment.getAllAlignments();
+		for(Alignment e: alignments){
+			if(e.checkVictory(this)){
+				return e;
+			}
+		}
+		return null;
 	}
 	
 	/**Takes commands in the main text channel and executes them.*/
