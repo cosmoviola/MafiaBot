@@ -16,7 +16,7 @@ public class ParanoidCop extends Role {
 			if(actor.isHooked()){
 				actor.privateMessage("Your action failed as you were hooked.");
 			}else if(target!=null){
-				actor.privateMessage(target.getDiscriminator()+wolfResult);
+				actor.privateMessage(target.getIdentifier()+wolfResult);
 			}
 		}
 	}

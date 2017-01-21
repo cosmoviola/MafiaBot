@@ -20,7 +20,7 @@ public class Wolf extends Role {
 					target.hook();
 				}else{
 					target.kill();
-					g.postMessage(target.getDiscriminator()+" has been killed. "
+					g.postMessage(target.getIdentifier()+" has been killed. "
 							+ "They were a "+target.getRole().cardFlip()+".");
 				}
 			}

@@ -54,8 +54,8 @@ public class Game {
 			if(players.containsKey(u)){
 				postMessage(u.getName()+" has already joined this game.");
 			}else{
-				names.put(u.getDiscriminator(), u);
 				Player p = new Player(u);
+				names.put(p.getIdentifier(), u);
 				players.put(u, p);
 				p.openPrivateChannel();
 				playerCount++;
@@ -75,8 +75,8 @@ public class Game {
 	public void removePlayer(User u){
 		if(state.equals(State.JOINING)){
 			if(players.containsKey(u)){
+				names.remove(players.get(u).getIdentifier());
 				players.remove(u);
-				names.remove(u.getDiscriminator());
 				playerCount--;
 				postMessage(u.getName()+" has left the game. "
 							+(GAME_SIZE-playerCount)+" players needed.");
@@ -116,8 +116,8 @@ public class Game {
 		}
 		
 		String message = "The game begins. The players are:";
-		for(User u: players.keySet()){
-			message+=" "+u.getDiscriminator();
+		for(Player p: players.values()){
+			message+=" "+p.getIdentifier();
 		}
 		postMessage(message+".");
 		beginNight();
@@ -192,8 +192,9 @@ public class Game {
 		if(currentLynch == null){
 			postMessage("No one was lynched.");
 		}else{
-			postMessage(currentLynch.getDiscriminator()+" was lynched. "
-					+ "He was a "+players.get(currentLynch).getRole().cardFlip()+".");
+			Player p = players.get(currentLynch);
+			postMessage(p.getIdentifier()+" was lynched. "
+					+ "He was a "+p.getRole().cardFlip()+".");
 		}
 		votes.clear();
 		Alignment a = checkVictory();
@@ -209,7 +210,7 @@ public class Game {
 		cancelTimer();
 		String message = a.getName()+"(";
 		for(Player e:a.getMembers()){
-			message+=e.getDiscriminator()+", ";
+			message+=e.getIdentifier()+", ";
 		}
 		message=message.substring(0, message.length()-2)+") have won!";
 		postMessage(message);

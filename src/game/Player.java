@@ -7,12 +7,14 @@ public class Player {
 	
 	private User user;
 	private Role role;
+	private String identifier;
 	private Alignment alignment;
 	private boolean isAlive = true;
 	private boolean hooked = false;
 	
 	public Player(User u){
 		user = u;
+		identifier = u.getName()+"#"+u.getDiscriminator();
 	}
 	
 	public void setRole(Role r){
@@ -27,8 +29,8 @@ public class Player {
 		alignment = a;
 	}
 	
-	public String getDiscriminator(){
-		return user.getDiscriminator();
+	public String getIdentifier(){
+		return identifier;
 	}
 	
 	public boolean isAlive(){

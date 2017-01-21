@@ -16,7 +16,7 @@ public class NaiveCop extends Role {
 			if(actor.isHooked()){
 				actor.privateMessage("Your action failed as you were hooked.");
 			}else if(target!=null){
-				actor.privateMessage(target.getDiscriminator()+copResult);
+				actor.privateMessage(target.getIdentifier()+copResult);
 			}
 		}
 	}

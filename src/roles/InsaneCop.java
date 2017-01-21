@@ -17,9 +17,9 @@ public class InsaneCop extends Role {
 				actor.privateMessage("Your action failed as you were hooked.");
 			}else if(target!=null){
 				if(target.isCop()){
-					actor.privateMessage(target.getDiscriminator()+wolfResult);
+					actor.privateMessage(target.getIdentifier()+wolfResult);
 				}else{
-					actor.privateMessage(target.getDiscriminator()+copResult);
+					actor.privateMessage(target.getIdentifier()+copResult);
 				}
 			}
 		}
