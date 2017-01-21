@@ -240,6 +240,9 @@ public class Game {
 	private void placeVote(User voter, User voted){
 		if(getState()==State.DAY){
 			votes.put(voter, voted);
+			if(votes.keySet().size()==living.size()&&cancelTimer()){
+				endDay();
+			}
 		}
 	}
 	
