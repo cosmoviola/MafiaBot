@@ -145,7 +145,12 @@ public class Game {
 		while(i.hasNext()){ //this is a separate loop in case a target is needed for another role.
 			i.next().resetTarget();
 		}
-		beginDay();
+		Alignment a = checkVictory();
+		if(a!=null){
+			endGame(a);
+		}else{
+			beginDay();
+		}
 	}
 	
 	/**Begin the next day.*/
@@ -191,10 +196,11 @@ public class Game {
 					+ "He was a "+players.get(currentLynch).getRole().cardFlip()+".");
 		}
 		votes.clear();
-		beginNight();
 		Alignment a = checkVictory();
 		if(a!=null){
 			endGame(a);
+		}else{
+			beginNight();
 		}
 	}
 	

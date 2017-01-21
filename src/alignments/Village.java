@@ -12,7 +12,7 @@ public class Village extends Alignment {
 	@Override
 	public boolean checkVictory(Game g) {
 		for(Player e: g.getPlayers()){
-			if(e.isAlive()||!e.getAlignment().equals(this)){
+			if(e.isAlive()&&!e.getAlignment().equals(this)){
 				return false;
 			}
 		}
