@@ -287,7 +287,7 @@ public class Game {
 					break;
 				}
 				String target = cmd[2];
-				if(names.containsKey(target)&&living.contains(author)){
+				if(names.containsKey(target)&&living.contains(players.get(author))){
 					placeVote(author, names.get(target));
 				}else{
 					placeVote(author, null);
