@@ -300,6 +300,7 @@ public class Game {
 				removePlayer(author);
 				break;
 			case "vote":
+			case "lynch":
 				if(cmd.length<3){
 					postMessage("Vote command must have a target.");
 					break;
