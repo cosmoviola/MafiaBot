@@ -33,6 +33,8 @@ public class Game {
 	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
 	private ScheduledFuture currentTimer;
 	private HashMap<User, User> votes = new HashMap<User, User>(); //first user is voter, second is voted for
+	private int NIGHT_TIME = 99999;
+	private int DAY_TIME = 99999;
 	
 	/**Initialize a game of c5*/
 	public Game(TextChannel c){
@@ -116,6 +118,7 @@ public class Game {
 			a.addPlayer(p);
 			p.privateMessage(r.roleMessage());
 			p.privateMessage(r.winCondition());
+			System.out.println(p.getIdentifier()+" "+r.getClass().getName());
 		}
 		
 		String message = "The game begins. The players are:";
@@ -134,7 +137,7 @@ public class Game {
 			public @Override void run() {
 				endNight();
 			}
-		}, 30, TimeUnit.SECONDS);
+		}, NIGHT_TIME, TimeUnit.SECONDS);
 	}
 	
 	/**End a night. Resolves all actions placed.*/
@@ -147,6 +150,9 @@ public class Game {
 		i = roles.iterator();
 		while(i.hasNext()){ //this is a separate loop in case a target is needed for another role.
 			i.next().resetTarget();
+		}
+		for(Player e:players.values()){
+			e.nightReset();
 		}
 		Alignment a = checkVictory();
 		if(a!=null){
@@ -167,7 +173,7 @@ public class Game {
 			public @Override void run() {
 				endDay();
 			}
-		}, 30, TimeUnit.SECONDS);
+		}, DAY_TIME, TimeUnit.SECONDS);
 	}
 	
 	/**End the day. Resolves the lynch.*/
@@ -288,14 +294,22 @@ public class Game {
 					break;
 				}
 				String target = cmd[2];
-				if(names.containsKey(target)&&living.contains(players.get(author))){
-					placeVote(author, names.get(target));
-				}else{
-					placeVote(author, null);
+				if(living.contains(players.get(author))){
+					if(names.containsKey(target)){
+						placeVote(author, names.get(target));
+					}else{
+						placeVote(author, null);
+					}
 				}
 				break;
 			case "unvote":
 				removeVote(author);
+				break;
+			case "endNight":
+				endNight();
+				break;
+			case "endDay":
+				endDay();
 				break;
 			default:
 				postMessage("Unrecognized command.");

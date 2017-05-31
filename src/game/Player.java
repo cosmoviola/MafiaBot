@@ -50,7 +50,7 @@ public class Player {
 	}
 	
 	public void openPrivateChannel(){
-		user.openPrivateChannel();
+		user.openPrivateChannel().queue();
 	}
 	
 	public void privateMessage(String s){
@@ -63,5 +63,9 @@ public class Player {
 	
 	public void hook(){
 		hooked = true;
+	}
+	
+	public void nightReset(){
+		hooked = false;
 	}
 }
