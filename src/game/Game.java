@@ -275,8 +275,10 @@ public class Game {
 	
 	/**Kills player p.*/
 	public void killPlayer(Player p){
-		living.remove(p);
-		p.kill();
+		if(living.contains(p)){
+			living.remove(p);
+			p.kill();
+		}
 	}
 	
 	/**Takes commands in the main text channel and executes them.*/
