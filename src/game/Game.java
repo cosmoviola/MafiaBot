@@ -227,7 +227,7 @@ public class Game {
 	private void endGame(Alignment a){
 		cancelTimer();
 		String message;
-		Collection c = a.getMembers();
+		Collection<Player> c = a.getMembers();
 		Iterator<Player> i = c.iterator();
 		if(c.size()==1){
 			message = i.next().getIdentifier()+" (the "+a.getName()+") has won!";
