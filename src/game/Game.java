@@ -202,9 +202,13 @@ public class Game {
 			postMessage("No one was lynched.");
 		}else{
 			Player p = players.get(currentLynch);
-			killPlayer(p);
-			postMessage(p.getIdentifier()+" was lynched. "
-					+ "He was a "+p.getRole().cardFlip()+".");
+			if(living.contains(p)){
+				killPlayer(p);
+				postMessage(p.getIdentifier()+" was lynched. "
+						+ "He was a "+p.getRole().cardFlip()+".");
+			}else{
+				postMessage("You tried to lynch "+p.getIdentifier()+", but he was already dead.");
+			}
 		}
 		votes.clear();
 		Alignment a = checkVictory();
