@@ -396,9 +396,11 @@ public class Game {
 		if(state != State.NIGHT){
 			return false;
 		}
-		for(Role r: roles){
-			if(!r.isTargetSet()){
-				return false;
+		for(Player p: getPlayers()){
+			if(p.isAlive()){
+				if(!p.getRole().isTargetSet()){
+					return false;
+				}
 			}
 		}
 		return true;
