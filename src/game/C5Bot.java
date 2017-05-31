@@ -1,11 +1,14 @@
 package game;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -15,6 +18,7 @@ public class C5Bot extends ListenerAdapter{
 	private static String token;
 	private static HashMap<TextChannel, Game> games = new HashMap<TextChannel, Game>();
 	private static HashMap<String, TextChannel> channels = new HashMap<String, TextChannel>(); 
+	private static Set<User> users = new HashSet<User>();
 	
 	/**Creates an instance of JDA*/
 	public static void main(String[] args) {
@@ -76,5 +80,20 @@ public class C5Bot extends ListenerAdapter{
 	/**Send a message to the given text channel*/
 	public static void postMessage(String s, TextChannel channel){
 		channel.sendMessage(s).queue();
+	}
+	
+	/**Adds User to list of Users in Games. A User cannot be in more than one Game at a time.*/
+	public static void addUserToUserList(User u){
+		users.add(u);
+	}
+	
+	/**Removes User from list of Users in Games.*/
+	public static void removeUserFromUserList(User u){
+		users.remove(u);
+	}
+	
+	/**Checks if User is in list of Users in Games.*/
+	public static boolean checkUserInUserList(User u){
+		return users.contains(u);
 	}
 }

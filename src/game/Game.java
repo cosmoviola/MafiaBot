@@ -48,6 +48,7 @@ public class Game {
 				cancelSetup();
 			}
 		}, 60, TimeUnit.SECONDS);
+		postMessage("A new game of c5 has started. Post '!c5 join' to join.");
 	}
 	
 	/**Adds a User to this game if game is in the JOINING state and the User has not joined yet.
@@ -57,7 +58,10 @@ public class Game {
 		if(state.equals(State.JOINING)){
 			if(players.containsKey(u)){
 				postMessage(u.getName()+" has already joined this game.");
+			}else if(C5Bot.checkUserInUserList(u)){
+				postMessage(u.getName()+" is aleady in a game of c5 and cannot join.");
 			}else{
+				C5Bot.addUserToUserList(u);
 				Player p = new Player(u);
 				names.put(p.getIdentifier(), u);
 				players.put(u, p);
@@ -82,6 +86,7 @@ public class Game {
 				names.remove(players.get(u).getIdentifier());
 				players.remove(u);
 				playerCount--;
+				C5Bot.removeUserFromUserList(u);
 				postMessage(u.getName()+" has left the game. "
 							+(GAME_SIZE-playerCount)+" players needed.");
 			}
@@ -243,6 +248,9 @@ public class Game {
 			message = "No one wins.";
 		}
 		postMessage(message);
+		for(User e:players.keySet()){
+			C5Bot.removeUserFromUserList(e);
+		}
 		C5Bot.removeGame(channel);
 	}
 	
