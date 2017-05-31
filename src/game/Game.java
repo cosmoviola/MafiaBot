@@ -343,6 +343,9 @@ public class Game {
 				executorRole.setTarget(null);
 				executor.privateMessage("You are targeting no one.");
 			}
+			if(allTargetsSet()){
+				endNight();
+			}
 		}else{
 			executor.privateMessage("That is not a valid command.");
 		}
@@ -382,6 +385,22 @@ public class Game {
 	 * If false is returned, the timer could not be stopped.*/
 	public boolean cancelTimer(){
 		return currentTimer.cancel(false);
+	}
+	
+	/**Checks if all targets for the night have been set.
+	 * 
+	 * @return True if it is night and everyone has set a target, false otherwise.
+	 */
+	public boolean allTargetsSet(){
+		if(state != State.NIGHT){
+			return false;
+		}
+		for(Role r: roles){
+			if(!r.isTargetSet()){
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	private class RoleAlignmentPair{
