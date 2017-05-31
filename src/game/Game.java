@@ -107,6 +107,10 @@ public class Game {
 		c5roles();
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(players.values());
 		Collections.shuffle(shufflePlayers);
+		String playersMessage = "The players are:";
+		for(Player p: players.values()){
+			playersMessage+=" "+p.getIdentifier();
+		}
 		for(int i=0; i<GAME_SIZE; i++){
 			RoleAlignmentPair pair = pairsToAssign.get(i);
 			Role r = pair.getRole();
@@ -116,16 +120,11 @@ public class Game {
 			p.setAlignment(a);
 			r.setActor(p);
 			a.addPlayer(p);
-			p.privateMessage(r.roleMessage());
+			p.privateMessage(r.roleMessage() + " "+playersMessage);
 			p.privateMessage(r.winCondition());
 			System.out.println(p.getIdentifier()+" "+r.getClass().getName());
 		}
-		
-		String message = "The game begins. The players are:";
-		for(Player p: players.values()){
-			message+=" "+p.getIdentifier();
-		}
-		postMessage(message+".");
+		postMessage("The game begins."+playersMessage+".");
 		beginNight();
 	}
 	
@@ -333,8 +332,10 @@ public class Game {
 		if(executorRole.getCommands().contains(cmd[1])){
 			if(names.containsKey(cmd[2])){
 				executorRole.setTarget(players.get(names.get(cmd[2])));
+				executor.privateMessage("You are targeting "+cmd[2]+".");
 			}else{
 				executorRole.setTarget(null);
+				executor.privateMessage("You are targeting no one.");
 			}
 		}else{
 			executor.privateMessage("That is not a valid command.");
@@ -348,11 +349,12 @@ public class Game {
 		roles.add(new InsaneCop(id));
 		roles.add(new NaiveCop(id));
 		roles.add(new ParanoidCop(id));
+		Alignment cops = new Village("cops");
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
-		pairsToAssign.add(new RoleAlignmentPair(roles.get(1), new Village("cops")));
-		pairsToAssign.add(new RoleAlignmentPair(roles.get(2), new Village("cops")));
-		pairsToAssign.add(new RoleAlignmentPair(roles.get(3), new Village("cops")));
-		pairsToAssign.add(new RoleAlignmentPair(roles.get(4), new Village("cops")));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(1), cops));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(2), cops));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(3), cops));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(4), cops));
 	}
 	
 	/**Send a message to the text channel this game is taking place in.*/
