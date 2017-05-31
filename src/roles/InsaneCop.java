@@ -4,8 +4,8 @@ import game.Game;
 
 public class InsaneCop extends Cop {
 
-	public InsaneCop(String id) {
-		super(id);
+	public InsaneCop() {
+	
 	}
 	
 	@Override

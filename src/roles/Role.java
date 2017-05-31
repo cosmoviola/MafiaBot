@@ -11,10 +11,9 @@ public abstract class Role {
 	protected String wolfResult = " is the wolf.";
 	protected Player target;
 	protected Player actor;
-	protected String id;
 	
-	public Role(String id){
-		this.id = id;
+	public Role(){
+		
 	}
 
 	public abstract void doAction(Game g);

@@ -6,8 +6,8 @@ import game.Game;
 
 public class Wolf extends Role {
 
-	public Wolf(String id) {
-		super(id);
+	public Wolf() {
+		
 	}
 
 	@Override
@@ -29,8 +29,8 @@ public class Wolf extends Role {
 
 	@Override
 	public String roleMessage() {
-		return "You are the wolf. At night on cycle 0, message me "+id+" hook <user> to hook user. "
-				+ "On following nights, message me "+id+" kill <user> to kill user.";
+		return "You are the wolf. At night on cycle 0, message me 'hook <user>' to hook user. "
+				+ "On following nights, message me 'kill <user>' to kill user.";
 	}
 
 	@Override

@@ -17,8 +17,8 @@ public class C5Bot extends ListenerAdapter{
 
 	private static String token;
 	private static HashMap<TextChannel, Game> games = new HashMap<TextChannel, Game>();
-	private static HashMap<String, TextChannel> channels = new HashMap<String, TextChannel>(); 
-	private static Set<User> users = new HashSet<User>();
+	private static HashMap<User, TextChannel> channels = new HashMap<User, TextChannel>();
+	private static User botUser;
 	
 	/**Creates an instance of JDA*/
 	public static void main(String[] args) {
@@ -32,6 +32,7 @@ public class C5Bot extends ListenerAdapter{
                     .setToken(token)
                     .addListener(new C5Bot())
                     .buildBlocking();
+            botUser = jda.getSelfUser();
         }
         catch(Exception e){
             e.printStackTrace();
@@ -51,7 +52,6 @@ public class C5Bot extends ListenerAdapter{
 				}else{
 					Game g = new Game(channel);
 					games.put(channel, g);
-					channels.put(channel.getId(), channel);
 					g.addPlayer(m.getAuthor());
 				}
 			}else if(games.containsKey(channel)){
@@ -62,11 +62,15 @@ public class C5Bot extends ListenerAdapter{
 	
 	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event){
-		Message m = event.getMessage();
-		String s = m.getContent();
-		String[] words = s.split(" ");
-		if(words.length>=3&&channels.containsKey(words[0])){
-			games.get(channels.get(words[0])).executePrivateCommand(words, event.getAuthor());
+		User author = event.getAuthor();
+		if(author.equals(botUser)){	
+		}else{
+			Message m = event.getMessage();
+			String s = m.getContent();
+			String[] words = s.split(" ");
+			if(words.length>=2){
+				games.get(channels.get(author)).executePrivateCommand(words, author);
+			}
 		}
 	}
 	
@@ -83,17 +87,17 @@ public class C5Bot extends ListenerAdapter{
 	}
 	
 	/**Adds User to list of Users in Games. A User cannot be in more than one Game at a time.*/
-	public static void addUserToUserList(User u){
-		users.add(u);
+	public static void addUserToUserList(User u, TextChannel t){
+		channels.put(u,t);
 	}
 	
 	/**Removes User from list of Users in Games.*/
-	public static void removeUserFromUserList(User u){
-		users.remove(u);
+	public static void removeUserFromUserList(User u, TextChannel t){
+		channels.remove(u,t);
 	}
 	
 	/**Checks if User is in list of Users in Games.*/
 	public static boolean checkUserInUserList(User u){
-		return users.contains(u);
+		return channels.keySet().contains(u);
 	}
 }

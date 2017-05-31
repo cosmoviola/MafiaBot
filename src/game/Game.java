@@ -25,7 +25,6 @@ public class Game {
 	private HashSet<Player> living;
 	private int playerCount = 0;
 	private TextChannel channel;
-	private String id; //identifier of TextChannel game takes place in
 	private int cycle = 0;
 	private ArrayList<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority. These are where actions are executed.
 	private ArrayList<RoleAlignmentPair> pairsToAssign = new ArrayList<RoleAlignmentPair>(); //these are to be assigned to players
@@ -39,7 +38,6 @@ public class Game {
 	/**Initialize a game of c5*/
 	public Game(TextChannel c){
 		channel = c;
-		id = c.getId();
 		state = State.JOINING;
 		players = new HashMap<User, Player>(7);
 		names = new HashMap<String, User>(7);
@@ -61,7 +59,7 @@ public class Game {
 			}else if(C5Bot.checkUserInUserList(u)){
 				postMessage(u.getName()+" is aleady in a game of c5 and cannot join.");
 			}else{
-				C5Bot.addUserToUserList(u);
+				C5Bot.addUserToUserList(u, channel);
 				Player p = new Player(u);
 				names.put(p.getIdentifier(), u);
 				players.put(u, p);
@@ -86,7 +84,7 @@ public class Game {
 				names.remove(players.get(u).getIdentifier());
 				players.remove(u);
 				playerCount--;
-				C5Bot.removeUserFromUserList(u);
+				C5Bot.removeUserFromUserList(u, channel);
 				postMessage(u.getName()+" has left the game. "
 							+(GAME_SIZE-playerCount)+" players needed.");
 			}
@@ -249,7 +247,7 @@ public class Game {
 		}
 		postMessage(message);
 		for(User e:players.keySet()){
-			C5Bot.removeUserFromUserList(e);
+			C5Bot.removeUserFromUserList(e, channel);
 		}
 		C5Bot.removeGame(channel);
 	}
@@ -337,10 +335,10 @@ public class Game {
 	public void executePrivateCommand(String[] cmd, User author){
 		Player executor = players.get(author);
 		Role executorRole = executor.getRole();
-		if(executorRole.getCommands().contains(cmd[1])){
-			if(names.containsKey(cmd[2])){
-				executorRole.setTarget(players.get(names.get(cmd[2])));
-				executor.privateMessage("You are targeting "+cmd[2]+".");
+		if(executorRole.getCommands().contains(cmd[0])){
+			if(names.containsKey(cmd[1])){
+				executorRole.setTarget(players.get(names.get(cmd[1])));
+				executor.privateMessage("You are targeting "+cmd[1]+".");
 			}else{
 				executorRole.setTarget(null);
 				executor.privateMessage("You are targeting no one.");
@@ -352,11 +350,11 @@ public class Game {
 	
 	/**Initialize game to use the roles in a c5 game.*/
 	public void c5roles(){
-		roles.add(new Wolf(id));
-		roles.add(new SaneCop(id));
-		roles.add(new InsaneCop(id));
-		roles.add(new NaiveCop(id));
-		roles.add(new ParanoidCop(id));
+		roles.add(new Wolf());
+		roles.add(new SaneCop());
+		roles.add(new InsaneCop());
+		roles.add(new NaiveCop());
+		roles.add(new ParanoidCop());
 		Alignment cops = new Village("cops");
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(1), cops));
