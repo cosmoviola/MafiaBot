@@ -172,7 +172,7 @@ public class Game {
 		state=State.DAY;
 		postMessage("It is now Day "+cycle+". "
 				+ "Vote for a player to lynch by submitting '!c5 vote <user>' or '&c5 vote <user>' in this channel. "
-				+ "You have 30 seconds.");
+				+ "You have "+DAY_TIME+" seconds.");
 		currentTimer = timerExecutor.schedule(new Runnable(){
 			public @Override void run() {
 				endDay();
