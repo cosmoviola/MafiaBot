@@ -243,7 +243,7 @@ public class Game {
 					next=false;
 				}
 			}
-			message=" (the "+a.getName()+") have won!";
+			message +=" (the "+a.getName()+") have won!";
 		}else{
 			message = "No one wins.";
 		}
