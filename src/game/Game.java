@@ -63,7 +63,6 @@ public class Game {
 				Player p = new Player(u);
 				names.put(p.getIdentifier(), u);
 				players.put(u, p);
-				p.openPrivateChannel();
 				playerCount++;
 				postMessage(u.getName()+" has joined the game. "
 						+(GAME_SIZE-playerCount)+" players still needed.");

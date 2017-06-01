@@ -49,12 +49,8 @@ public class Player {
 		return alignment.equals(Alignment.getAlignment("cops"));
 	}
 	
-	public void openPrivateChannel(){
-		user.openPrivateChannel().queue();
-	}
-	
 	public void privateMessage(String s){
-		user.getPrivateChannel().sendMessage(s).queue();
+		user.openPrivateChannel().queue((channel) -> channel.sendMessage(s).queue());
 	}
 	
 	public void kill(){
