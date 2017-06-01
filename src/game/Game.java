@@ -46,7 +46,7 @@ public class Game {
 				cancelSetup();
 			}
 		}, 60, TimeUnit.SECONDS);
-		postMessage("A new game of c5 has started. Post '!c5 join' to join.");
+		postMessage("A new game of c5 has started. Post '!c5 join' or '&c5 join' to join.");
 	}
 	
 	/**Adds a User to this game if game is in the JOINING state and the User has not joined yet.
@@ -99,6 +99,9 @@ public class Game {
 	/**Ends game if not enough people joined in time during the JOINING state.*/
 	private void cancelSetup(){
 		postMessage("Not enough people joined.");
+		for(User e:players.keySet()){
+			C5Bot.removeUserFromUserList(e, channel);
+		}
 		C5Bot.removeGame(channel);
 	}
 	
@@ -169,7 +172,7 @@ public class Game {
 		cycle++;
 		state=State.DAY;
 		postMessage("It is now Day "+cycle+". "
-				+ "Vote for a player to lynch by submitting !c5 vote <user> in this channel. "
+				+ "Vote for a player to lynch by submitting '!c5 vote <user>' or '&c5 vote <user>' in this channel. "
 				+ "You have 30 seconds.");
 		currentTimer = timerExecutor.schedule(new Runnable(){
 			public @Override void run() {

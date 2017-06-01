@@ -45,7 +45,7 @@ public class C5Bot extends ListenerAdapter{
 		String s = m.getContent();
 		TextChannel channel = m.getTextChannel();
 		String[] words = s.split(" ");
-		if(words.length>=2&&words[0].toLowerCase().equals("!c5")){
+		if(words.length>=2&&(words[0].toLowerCase().equals("!c5")||words[0].toLowerCase().equals("&c5"))){
 			if(words[1].toLowerCase().equals("start")){
 				if(games.containsKey(channel)){
 					postMessage("There is already a c5 game running in this channel.", channel);
