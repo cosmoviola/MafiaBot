@@ -30,7 +30,7 @@ public class C5Bot extends ListenerAdapter{
 		try{
             JDA jda = new JDABuilder(AccountType.BOT)
                     .setToken(token)
-                    .addListener(new C5Bot())
+                    .addEventListener(new C5Bot())
                     .buildBlocking();
             botUser = jda.getSelfUser();
         }
@@ -42,7 +42,7 @@ public class C5Bot extends ListenerAdapter{
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event){
 		Message m = event.getMessage();
-		String s = m.getContent();
+		String s = m.getContentRaw();
 		TextChannel channel = m.getTextChannel();
 		String[] words = s.split(" ");
 		if(words.length>=2&&(words[0].toLowerCase().equals("!c5")||words[0].toLowerCase().equals("&c5"))){
@@ -66,7 +66,7 @@ public class C5Bot extends ListenerAdapter{
 		if(author.equals(botUser)){	
 		}else{
 			Message m = event.getMessage();
-			String s = m.getContent();
+			String s = m.getContentRaw();
 			String[] words = s.split(" ");
 			if(words.length>=2){
 				games.get(channels.get(author)).executePrivateCommand(words, author);
