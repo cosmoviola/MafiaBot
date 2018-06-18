@@ -1,6 +1,10 @@
 package game;
+import java.util.concurrent.CompletionStage;
+
 import alignments.Alignment;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.requests.RequestFuture;
 import roles.Role;
 
 public class Player {
@@ -49,8 +53,8 @@ public class Player {
 		return alignment.equals(Alignment.getAlignment("cops"));
 	}
 	
-	public void privateMessage(String s){
-		user.openPrivateChannel().queue((channel) -> channel.sendMessage(s).queue());
+	public RequestFuture<Message> privateMessage(String s){
+		return (RequestFuture<Message>) user.openPrivateChannel().submit().thenCompose(((channel) -> channel.sendMessage(s).submit()));
 	}
 	
 	public void kill(){

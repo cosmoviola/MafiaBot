@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -12,8 +13,10 @@ import java.util.concurrent.TimeUnit;
 import alignments.Alignment;
 import alignments.Self;
 import alignments.Village;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.requests.RequestFuture;
 import roles.*;
 
 public class Game {
@@ -43,7 +46,8 @@ public class Game {
 		names = new HashMap<String, User>(7);
 		currentTimer = timerExecutor.schedule(new Runnable(){
 			public @Override void run() {
-				cancelSetup();
+				postMessage("Not enough people joined.");
+				cancelGame();
 			}
 		}, 60, TimeUnit.SECONDS);
 		postMessage("A new game of c5 has started. Post '!c5 join' or '&c5 join' to join.");
@@ -95,9 +99,8 @@ public class Game {
 		return players.values();
 	}
 	
-	/**Ends game if not enough people joined in time during the JOINING state.*/
-	private void cancelSetup(){
-		postMessage("Not enough people joined.");
+	/**Ends game prematurely.*/
+	private void cancelGame(){
 		for(User e:players.keySet()){
 			C5Bot.removeUserFromUserList(e, channel);
 		}
@@ -116,6 +119,7 @@ public class Game {
 		for(Player p: players.values()){
 			playersMessage+=" "+p.getIdentifier();
 		}
+		ArrayList<RequestFuture<Message>> messageFutures = new ArrayList<RequestFuture<Message>>(GAME_SIZE);
 		for(int i=0; i<GAME_SIZE; i++){
 			RoleAlignmentPair pair = pairsToAssign.get(i);
 			Role r = pair.getRole();
@@ -125,9 +129,14 @@ public class Game {
 			p.setAlignment(a);
 			r.setActor(p);
 			a.addPlayer(p);
-			p.privateMessage(r.roleMessage() + " "+playersMessage);
-			p.privateMessage(r.winCondition());
+			messageFutures.set(i, p.privateMessage(r.roleMessage() + " "+playersMessage+"\n"+r.winCondition()));
 			System.out.println(p.getIdentifier()+" "+r.getClass().getName());
+		}
+		try{
+			RequestFuture.allOf(messageFutures).join();
+		}catch (CompletionException e){
+			postMessage("There was a problem sending out role PMs. Game is being cancelled.");
+			cancelGame();
 		}
 		postMessage("The game begins."+playersMessage+".");
 		beginNight();
