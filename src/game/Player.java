@@ -1,10 +1,9 @@
 package game;
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import alignments.Alignment;
-import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.requests.RequestFuture;
 import roles.Role;
 
 public class Player {
@@ -53,8 +52,14 @@ public class Player {
 		return alignment.equals(Alignment.getAlignment("cops"));
 	}
 	
-	public RequestFuture<Message> privateMessage(String s){
-		return (RequestFuture<Message>) user.openPrivateChannel().submit().thenCompose(((channel) -> channel.sendMessage(s).submit()));
+	public CompletableFuture<Boolean> privateMessage(String s){
+		CompletableFuture<Boolean> future = new CompletableFuture<Boolean>();
+		user.openPrivateChannel().queue(
+			channel -> channel.sendMessage(s).queue(
+				x -> future.complete(true),
+				t -> future.completeExceptionally(new CompletionException(new Exception("Could not send message.")))),
+			x -> future.completeExceptionally(new CompletionException(new Exception("Could not get private channel."))));
+		return future;
 	}
 	
 	public void kill(){

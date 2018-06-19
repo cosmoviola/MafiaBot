@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -16,7 +17,6 @@ import alignments.Village;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.requests.RequestFuture;
 import roles.*;
 
 public class Game {
@@ -31,7 +31,7 @@ public class Game {
 	private int cycle = 0;
 	private ArrayList<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority. These are where actions are executed.
 	private ArrayList<RoleAlignmentPair> pairsToAssign = new ArrayList<RoleAlignmentPair>(); //these are to be assigned to players
-	private final int GAME_SIZE = 5; //final because this is c5.
+	private final int GAME_SIZE = 1; //final because this is c5.
 	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
 	private ScheduledFuture currentTimer;
 	private HashMap<User, User> votes = new HashMap<User, User>(); //first user is voter, second is voted for
@@ -112,14 +112,14 @@ public class Game {
 		cancelTimer();
 		//role assignment
 		living = new HashSet<Player>(players.values());
-		c5roles();
+		onePlayerTestRoles();
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(players.values());
 		Collections.shuffle(shufflePlayers);
 		String playersMessage = "The players are:";
 		for(Player p: players.values()){
 			playersMessage+=" "+p.getIdentifier();
 		}
-		ArrayList<RequestFuture<Message>> messageFutures = new ArrayList<RequestFuture<Message>>(GAME_SIZE);
+		CompletableFuture<Boolean>[] messageFutures = new CompletableFuture[GAME_SIZE];
 		for(int i=0; i<GAME_SIZE; i++){
 			RoleAlignmentPair pair = pairsToAssign.get(i);
 			Role r = pair.getRole();
@@ -129,14 +129,15 @@ public class Game {
 			p.setAlignment(a);
 			r.setActor(p);
 			a.addPlayer(p);
-			messageFutures.set(i, p.privateMessage(r.roleMessage() + " "+playersMessage+"\n"+r.winCondition()));
+			messageFutures[i] = p.privateMessage(r.roleMessage() + " "+playersMessage+"\n"+r.winCondition());
 			System.out.println(p.getIdentifier()+" "+r.getClass().getName());
 		}
 		try{
-			RequestFuture.allOf(messageFutures).join();
+			CompletableFuture.allOf(messageFutures).join();
 		}catch (CompletionException e){
 			postMessage("There was a problem sending out role PMs. Game is being cancelled.");
 			cancelGame();
+			throw e;
 		}
 		postMessage("The game begins."+playersMessage+".");
 		beginNight();
@@ -376,6 +377,12 @@ public class Game {
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(2), cops));
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(3), cops));
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(4), cops));
+	}
+	
+	/**One player game for testing purposes.*/
+	public void onePlayerTestRoles(){
+		roles.add(new Wolf());
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
 	}
 	
 	/**Send a message to the text channel this game is taking place in.*/
