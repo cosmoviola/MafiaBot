@@ -31,7 +31,7 @@ public class Game {
 	private int cycle = 0;
 	private ArrayList<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority. These are where actions are executed.
 	private ArrayList<RoleAlignmentPair> pairsToAssign = new ArrayList<RoleAlignmentPair>(); //these are to be assigned to players
-	private final int GAME_SIZE = 1; //final because this is c5.
+	private final int GAME_SIZE = 5; //final because this is c5.
 	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
 	private ScheduledFuture currentTimer;
 	private HashMap<User, User> votes = new HashMap<User, User>(); //first user is voter, second is voted for
@@ -69,7 +69,7 @@ public class Game {
 				players.put(u, p);
 				playerCount++;
 				postMessage(u.getName()+" has joined the game. "
-						+(GAME_SIZE-playerCount)+" players still needed.");
+						+(GAME_SIZE-playerCount)+" player" + (GAME_SIZE-playerCount == 1 ? "s" : "") + " still needed.");
 			}
 			if(playerCount==GAME_SIZE){
 				postMessage("Enough players have joined the game. Game starting.");
@@ -89,7 +89,7 @@ public class Game {
 				playerCount--;
 				C5Bot.removeUserFromUserList(u, channel);
 				postMessage(u.getName()+" has left the game. "
-							+(GAME_SIZE-playerCount)+" players needed.");
+							+(GAME_SIZE-playerCount)+" player" + (GAME_SIZE-playerCount == 1 ? "s" : "") + " needed.");
 			}
 		}
 	}
@@ -112,7 +112,7 @@ public class Game {
 		cancelTimer();
 		//role assignment
 		living = new HashSet<Player>(players.values());
-		onePlayerTestRoles();
+		c5roles();
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(players.values());
 		Collections.shuffle(shufflePlayers);
 		String playersMessage = "The players are:";
@@ -146,7 +146,7 @@ public class Game {
 	/**Begin a night.*/
 	private void beginNight(){
 		state=State.NIGHT;
-		postMessage("It is now Night "+cycle+". The night ends in 30 seconds or when all actions are in.");
+		postMessage("It is now Night "+cycle+". The night ends in "+NIGHT_TIME+" seconds or when all actions are in.");
 		currentTimer = timerExecutor.schedule(new Runnable(){
 			public @Override void run() {
 				endNight();
@@ -383,6 +383,15 @@ public class Game {
 	public void onePlayerTestRoles(){
 		roles.add(new Wolf());
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
+	}
+	
+	/**Two player game for testing purposes.*/
+	public void twoPlayerTestRoles(){
+		roles.add(new Wolf());
+		roles.add(new SaneCop());
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
+		Alignment cops = new Village("cops");
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(1),cops));
 	}
 	
 	/**Send a message to the text channel this game is taking place in.*/
