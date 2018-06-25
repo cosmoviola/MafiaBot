@@ -219,9 +219,9 @@ public class Game {
 			if(living.contains(p)){
 				killPlayer(p);
 				postMessage(p.getIdentifier()+" was lynched. "
-						+ "He was a "+p.getRole().cardFlip()+".");
+						+ "They were a "+p.getRole().cardFlip()+".");
 			}else{
-				postMessage("You tried to lynch "+p.getIdentifier()+", but he was already dead.");
+				postMessage("You tried to lynch "+p.getIdentifier()+", but they were already dead.");
 			}
 		}
 		votes.clear();
