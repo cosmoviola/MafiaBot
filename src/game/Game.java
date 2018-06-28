@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import alignments.Alignment;
 import alignments.Self;
 import alignments.Village;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -35,6 +36,7 @@ public class Game {
 	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
 	private ScheduledFuture currentTimer;
 	private HashMap<User, User> votes = new HashMap<User, User>(); //first user is voter, second is voted for
+	private HashMap<String, HashSet<User>> nicks = new HashMap<String, HashSet<User>>(); //maps a player's nickname to the set of users with that name
 	private int NIGHT_TIME = 99999;
 	private int DAY_TIME = 99999;
 	
@@ -56,7 +58,8 @@ public class Game {
 	/**Adds a User to this game if game is in the JOINING state and the User has not joined yet.
 	 * When game is full, begins the game.
 	 */
-	public void addPlayer(User u){
+	public void addPlayer(Member mem){
+		User u = mem.getUser();
 		if(state.equals(State.JOINING)){
 			if(players.containsKey(u)){
 				postMessage(u.getName()+" has already joined this game.");
@@ -68,6 +71,15 @@ public class Game {
 				names.put(p.getIdentifier(), u);
 				players.put(u, p);
 				playerCount++;
+				//add nickname mapping
+				String nick = mem.getNickname().toLowerCase();
+				if(nicks.containsKey(nick)){
+					nicks.get(nick).add(u);
+				}else{
+					HashSet<User> set = new HashSet<User>();
+					set.add(u);
+					nicks.put(nick, set);
+				}
 				postMessage(u.getName()+" has joined the game. "
 						+(GAME_SIZE-playerCount)+" player" + (GAME_SIZE-playerCount == 1 ? "s" : "") + " still needed.");
 			}
@@ -81,9 +93,19 @@ public class Game {
 	}
 	
 	/**Removes the given user from the game if game is in the JOINING state and the User has joined.*/
-	public void removePlayer(User u){
+	public void removePlayer(Member mem){
+		User u = mem.getUser();
 		if(state.equals(State.JOINING)){
 			if(players.containsKey(u)){
+				nicks.forEach((k,v) -> {
+					if(v.contains(u)){
+						if(v.size()==1){
+							nicks.remove(k);
+						}else{
+							v.remove(u);
+						}
+					}
+				});
 				names.remove(players.get(u).getIdentifier());
 				players.remove(u);
 				playerCount--;
@@ -156,6 +178,7 @@ public class Game {
 	
 	/**End a night. Resolves all actions placed.*/
 	private void endNight(){
+		currentTimer.cancel(false);
 		postMessage("The night has ended.");
 		Iterator<Role> i = roles.iterator();
 		while(i.hasNext()){
@@ -192,6 +215,7 @@ public class Game {
 	
 	/**End the day. Resolves the lynch.*/
 	private void endDay(){
+		currentTimer.cancel(false);
 		postMessage("The voting period has ended.");
 		HashMap<User, Integer> tally = new HashMap<User, Integer>();
 		for(User e:votes.values()){
@@ -303,13 +327,14 @@ public class Game {
 	}
 	
 	/**Takes commands in the main text channel and executes them.*/
-	public void executeChannelCommand(String[] cmd, User author){
+	public void executeChannelCommand(String[] cmd, Member member){
+		User author = member.getUser();
 		switch(cmd[1]){
 			case "join":
-				addPlayer(author);
+				addPlayer(member);
 				break;
 			case "leave":
-				removePlayer(author);
+				removePlayer(member);
 				break;
 			case "vote":
 			case "lynch":

@@ -52,10 +52,10 @@ public class C5Bot extends ListenerAdapter{
 				}else{
 					Game g = new Game(channel);
 					games.put(channel, g);
-					g.addPlayer(m.getAuthor());
+					g.addPlayer(m.getMember());
 				}
 			}else if(games.containsKey(channel)){
-				games.get(channel).executeChannelCommand(words, m.getAuthor());
+				games.get(channel).executeChannelCommand(words, m.getMember());
 			}
 		}
 	}
