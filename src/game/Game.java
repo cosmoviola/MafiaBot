@@ -72,7 +72,7 @@ public class Game {
 				players.put(u, p);
 				playerCount++;
 				//add nickname mapping
-				String nick = mem.getNickname().toLowerCase();
+				String nick = mem.getEffectiveName().toLowerCase();
 				if(nicks.containsKey(nick)){
 					nicks.get(nick).add(u);
 				}else{
@@ -326,6 +326,20 @@ public class Game {
 		}
 	}
 	
+	/**Attempts to turn a user-provided target string identifying a player into a User object representing the target. 
+	 * Returns null if no such user uniquely exists. This can happen if two users have the same nickname. */
+	public User getTarget(String target){
+		if(names.containsKey(target)){
+			return names.get(target);
+		}else if(nicks.containsKey(target.toLowerCase())){
+			HashSet<User> set = nicks.get(target.toLowerCase());
+			if(set.size()==1){
+				return set.iterator().next();
+			}
+		}
+		return null;
+	}
+	
 	/**Takes commands in the main text channel and executes them.*/
 	public void executeChannelCommand(String[] cmd, Member member){
 		User author = member.getUser();
@@ -344,11 +358,7 @@ public class Game {
 				}
 				String target = cmd[2];
 				if(living.contains(players.get(author))){
-					if(names.containsKey(target)){
-						placeVote(author, names.get(target));
-					}else{
-						placeVote(author, null);
-					}
+					placeVote(author, getTarget(target));
 				}
 				break;
 			case "unvote":
@@ -374,11 +384,11 @@ public class Game {
 		Player executor = players.get(author);
 		Role executorRole = executor.getRole();
 		if(executorRole.getCommands().contains(cmd[0])){
-			if(names.containsKey(cmd[1])){
-				executorRole.setTarget(players.get(names.get(cmd[1])));
-				executor.privateMessage("You are targeting "+cmd[1]+".");
+			User target = getTarget(cmd[1]);
+			executorRole.setTarget(players.get(target));
+			if(target != null){
+				executor.privateMessage("You are targeting "+cmd[1]+" (Discord ID: "+target.getName()+"#"+target.getDiscriminator()+").");
 			}else{
-				executorRole.setTarget(null);
 				executor.privateMessage("You are targeting no one.");
 			}
 			if(allTargetsSet()){
