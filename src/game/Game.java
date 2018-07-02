@@ -1,10 +1,12 @@
 package game;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledFuture;
@@ -15,7 +17,6 @@ import alignments.Alignment;
 import alignments.Self;
 import alignments.Village;
 import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import roles.*;
@@ -32,13 +33,14 @@ public class Game {
 	private int cycle = 0;
 	private ArrayList<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority. These are where actions are executed.
 	private ArrayList<RoleAlignmentPair> pairsToAssign = new ArrayList<RoleAlignmentPair>(); //these are to be assigned to players
-	private final int GAME_SIZE = 5; //final because this is c5.
+	private int GAME_SIZE = 2;
 	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
 	private ScheduledFuture currentTimer;
-	private HashMap<User, User> votes = new HashMap<User, User>(); //first user is voter, second is voted for
+	private HashMap<User, Vote> votes = new HashMap<User, Vote>(); //key is the voter, value is that user's vote
+	private final List<String> NO_LYNCH_STRINGS = Arrays.asList("nolynch", "novote", "idle");
 	private HashMap<String, HashSet<User>> nicks = new HashMap<String, HashSet<User>>(); //maps a player's nickname to the set of users with that name
-	private int NIGHT_TIME = 99999;
-	private int DAY_TIME = 99999;
+	private int NIGHT_TIME = 120;
+	private int DAY_TIME = 120;
 	
 	/**Initialize a game of c5*/
 	public Game(TextChannel c){
@@ -134,7 +136,7 @@ public class Game {
 		cancelTimer();
 		//role assignment
 		living = new HashSet<Player>(players.values());
-		c5roles();
+		twoPlayerTestRoles();
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(players.values());
 		Collections.shuffle(shufflePlayers);
 		String playersMessage = "The players are:";
@@ -218,16 +220,19 @@ public class Game {
 		currentTimer.cancel(false);
 		postMessage("The voting period has ended.");
 		HashMap<User, Integer> tally = new HashMap<User, Integer>();
-		for(User e:votes.values()){
-			if(tally.containsKey(e)){
-				tally.put(e, tally.get(e)+1);
+		for(Vote e:votes.values()){
+			User u = e.getVote();
+			if(e.isVoteSet() && tally.containsKey(u)){
+				tally.put(u, tally.get(u)+1);
 			}else{
-				tally.put(e, 1);
+				tally.put(u, 1);
 			}
 		}
 		int max = 0;
 		User currentLynch = null;
+		System.out.println("\nDay " + cycle + " vote:");
 		for(User e: tally.keySet()){
+			System.out.println(e + " got " + tally.get(e) + " votes.");
 			int current = tally.get(e);
 			if(max<current){
 				max = current;
@@ -289,9 +294,9 @@ public class Game {
 	}
 	
 	/**Places a vote by voter onto voted.*/
-	private void placeVote(User voter, User voted){
+	private void placeVote(User voter, Vote vote){
 		if(getState()==State.DAY){
-			votes.put(voter, voted);
+			votes.put(voter, vote);
 			if(votes.keySet().size()==living.size()&&cancelTimer()){
 				endDay();
 			}
@@ -328,7 +333,7 @@ public class Game {
 	
 	/**Attempts to turn a user-provided target string identifying a player into a User object representing the target. 
 	 * Returns null if no such user uniquely exists. This can happen if two users have the same nickname. */
-	public User getTarget(String target){
+	public User getNamedTarget(String target){
 		if(names.containsKey(target)){
 			return names.get(target);
 		}else if(nicks.containsKey(target.toLowerCase())){
@@ -338,6 +343,22 @@ public class Game {
 			}
 		}
 		return null;
+	}
+	
+	/**Returns a vote for the either the user represented by the input, no lynch, or an unset vote if the input string is meaningless.*/
+	public Vote getVoteFromTarget(String target){
+		Vote v = new Vote();
+		if(NO_LYNCH_STRINGS.contains(target.replaceAll("\\s", "").toLowerCase())){
+			v.setNoLynch();
+		}else{
+			User u = getNamedTarget(target);
+			if(u == null){
+				v.unsetVote();
+			}else{
+				v.setVote(u);
+			}
+		}
+		return v;
 	}
 	
 	/**Takes commands in the main text channel and executes them.*/
@@ -356,9 +377,14 @@ public class Game {
 					postMessage("Vote command must have a target.");
 					break;
 				}
-				String target = cmd[2];
+				String target = String.join(" ", Arrays.copyOfRange(cmd, 2, cmd.length));
 				if(living.contains(players.get(author))){
-					placeVote(author, getTarget(target));
+					Vote v = getVoteFromTarget(target);
+					if(v.isVoteSet()){
+						placeVote(author, v);
+					}else{
+						postMessage(target + " is not a valid vote target.");
+					}
 				}
 				break;
 			case "unvote":
@@ -384,10 +410,11 @@ public class Game {
 		Player executor = players.get(author);
 		Role executorRole = executor.getRole();
 		if(executorRole.getCommands().contains(cmd[0])){
-			User target = getTarget(cmd[1]);
+			String targetStr = String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length));
+			User target = getNamedTarget(targetStr);
 			executorRole.setTarget(players.get(target));
 			if(target != null){
-				executor.privateMessage("You are targeting "+cmd[1]+" (Discord ID: "+target.getName()+"#"+target.getDiscriminator()+").");
+				executor.privateMessage("You are targeting "+targetStr+" (Discord ID: "+target.getName()+"#"+target.getDiscriminator()+").");
 			}else{
 				executor.privateMessage("You are targeting no one.");
 			}
