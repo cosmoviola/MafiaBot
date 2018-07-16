@@ -25,6 +25,7 @@ public class Game {
 	
 	public static enum State {JOINING, DAY, NIGHT};
 	private State state;
+	private HashSet<Member> members;
 	private HashMap<User, Player> players;
 	private HashMap<String, User> names; //gets a user from the user's identifier
 	private HashSet<Player> living;
@@ -38,6 +39,7 @@ public class Game {
 	private ScheduledFuture currentTimer;
 	private HashMap<User, Vote> votes = new HashMap<User, Vote>(); //key is the voter, value is that user's vote
 	private final List<String> NO_LYNCH_STRINGS = Arrays.asList("nolynch", "novote", "idle");
+	private final List<String> IDLE_ACTION_STRINGS = Arrays.asList("idle");
 	private HashMap<String, HashSet<User>> nicks = new HashMap<String, HashSet<User>>(); //maps a player's nickname to the set of users with that name
 	private int NIGHT_TIME = 120;
 	private int DAY_TIME = 120;
@@ -71,6 +73,7 @@ public class Game {
 				C5Bot.addUserToUserList(u, channel);
 				Player p = new Player(u);
 				names.put(p.getIdentifier(), u);
+				members.add(mem);
 				players.put(u, p);
 				playerCount++;
 				//add nickname mapping
@@ -112,6 +115,7 @@ public class Game {
 				players.remove(u);
 				playerCount--;
 				C5Bot.removeUserFromUserList(u, channel);
+				members.remove(mem);
 				postMessage(u.getName()+" has left the game. "
 							+(GAME_SIZE-playerCount)+" player" + (GAME_SIZE-playerCount == 1 ? "s" : "") + " needed.");
 			}
@@ -383,7 +387,7 @@ public class Game {
 					if(v.isVoteSet()){
 						placeVote(author, v);
 					}else{
-						postMessage(target + " is not a valid vote target.");
+						postMessage(target + " does not uniquely identify a valid vote target. Your previous vote is unchanged, if you set one.");
 					}
 				}
 				break;
@@ -411,12 +415,16 @@ public class Game {
 		Role executorRole = executor.getRole();
 		if(executorRole.getCommands().contains(cmd[0])){
 			String targetStr = String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length));
-			User target = getNamedTarget(targetStr);
-			executorRole.setTarget(players.get(target));
-			if(target != null){
-				executor.privateMessage("You are targeting "+targetStr+" (Discord ID: "+target.getName()+"#"+target.getDiscriminator()+").");
+			if(IDLE_ACTION_STRINGS.contains(targetStr)){
+				executor.privateMessage("You are idling your action.");
 			}else{
-				executor.privateMessage("You are targeting no one.");
+				User target = getNamedTarget(targetStr);
+				if(target != null){
+					executorRole.setTarget(players.get(target));
+					executor.privateMessage("You are targeting "+targetStr+" (Discord ID: "+target.getName()+"#"+target.getDiscriminator()+").");
+				}else{
+					executor.privateMessage(targetStr + " does not uniquely identify a valid target. Your previous target is unchanged, if you set one.");
+				}
 			}
 			if(allTargetsSet()){
 				endNight();
