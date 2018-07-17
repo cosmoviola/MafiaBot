@@ -1,5 +1,6 @@
 package roles;
 
+import java.util.Collection;
 import java.util.HashSet;
 
 import game.Game;
@@ -41,6 +42,10 @@ public abstract class Role {
 	public abstract String roleMessage();
 	
 	public abstract String roleMessageForThisNight(Game g);
+	
+	public abstract boolean canTarget(Player p);
+	
+	public abstract Collection<Player> getValidTargets(Game g);
 	
 	public abstract String winCondition();
 	

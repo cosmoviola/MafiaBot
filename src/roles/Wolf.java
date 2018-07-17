@@ -1,8 +1,10 @@
 package roles;
 
+import java.util.Collection;
 import java.util.HashSet;
 
 import game.Game;
+import game.Player;
 
 public class Wolf extends Role {
 
@@ -40,6 +42,18 @@ public class Wolf extends Role {
 		}else{
 			return "It is Night "+g.getCycle()+". Message me 'kill <user>' to kill target user.";
 		}
+	}
+	
+	@Override
+	public boolean canTarget(Player p){
+		return p.isAlive();
+	}
+	
+	@Override
+	public Collection<Player> getValidTargets(Game g){
+		Collection<Player> players = g.getPlayers();
+		g.getPlayers().removeIf((p-> !canTarget(p)));
+		return players;
 	}
 
 	@Override

@@ -1,8 +1,10 @@
 package roles;
 
+import java.util.Collection;
 import java.util.HashSet;
 
 import game.Game;
+import game.Player;
 
 public abstract class Cop extends Role {
 
@@ -19,6 +21,18 @@ public abstract class Cop extends Role {
 	@Override
 	public String roleMessageForThisNight(Game g){
 		return "It is Night "+g.getCycle()+". Message me 'check <user>' to determine user's alignment.";
+	}
+	
+	@Override
+	public boolean canTarget(Player p){
+		return p.isAlive();
+	}
+	
+	@Override
+	public Collection<Player> getValidTargets(Game g){
+		Collection<Player> players = g.getPlayers();
+		g.getPlayers().removeIf((p-> !canTarget(p)));
+		return players;
 	}
 	
 	@Override
