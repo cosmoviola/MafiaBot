@@ -32,6 +32,15 @@ public class Wolf extends Role {
 		return "You are the wolf. At night on cycle 0, message me 'hook <user>' to hook user. "
 				+ "On following nights, message me 'kill <user>' to kill user.";
 	}
+	
+	@Override
+	public String roleMessageForThisNight(Game g){
+		if(g.getCycle() == 0){
+			return "It is Night 0. Message me 'hook <user>' to hook target user.";
+		}else{
+			return "It is Night "+g.getCycle()+". Message me 'kill <user>' to kill target user.";
+		}
+	}
 
 	@Override
 	public String winCondition() {

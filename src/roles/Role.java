@@ -40,6 +40,8 @@ public abstract class Role {
 	
 	public abstract String roleMessage();
 	
+	public abstract String roleMessageForThisNight(Game g);
+	
 	public abstract String winCondition();
 	
 	public abstract String cardFlip();
