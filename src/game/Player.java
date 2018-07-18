@@ -28,6 +28,10 @@ public class Player {
 		return role;
 	}
 	
+	public User getUser(){
+		return user;
+	}
+	
 	public void setAlignment(Alignment a){
 		alignment = a;
 	}
