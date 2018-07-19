@@ -37,11 +37,21 @@ public class Wolf extends Role {
 	
 	@Override
 	public String roleMessageForThisNight(Game g){
+		String beginning;
 		if(g.getCycle() == 0){
-			return "It is Night 0. Message me 'hook <user>' to hook target user.";
+			beginning = "It is Night 0. Message me 'hook <user>' to hook target user.";
 		}else{
-			return "It is Night "+g.getCycle()+". Message me 'kill <user>' to kill target user.";
+			beginning = "It is Night "+g.getCycle()+". Message me 'kill <user>' to kill target user.";
 		}
+		Collection<Player> validTargets = getValidTargets(g);
+		String targets = "";
+		for(Player p : validTargets){
+			targets += " " + g.getCurrentStoredNick(p) + " (ID: " + p.getIdentifier() + ")";
+		}
+		if(targets.equals("")){
+			return beginning;
+		}
+		return beginning + " You may target:" + targets + ".";
 	}
 	
 	@Override

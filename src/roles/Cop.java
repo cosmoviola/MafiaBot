@@ -20,7 +20,15 @@ public abstract class Cop extends Role {
 	
 	@Override
 	public String roleMessageForThisNight(Game g){
-		return "It is Night "+g.getCycle()+". Message me 'check <user>' to determine user's alignment.";
+		Collection<Player> validTargets = getValidTargets(g);
+		String targets = "";
+		for(Player p : validTargets){
+			targets += " " + g.getCurrentStoredNick(p) + " (ID: " + p.getIdentifier() + ")";
+		}
+		if(targets.equals("")){
+			return "It is Night "+g.getCycle()+". You do not have any valid targets for your action.";
+		}
+		return "It is Night "+g.getCycle()+". Message me 'check <user>' to determine user's alignment. You may target:" + targets + ".";
 	}
 	
 	@Override
