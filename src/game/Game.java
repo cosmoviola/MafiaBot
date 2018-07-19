@@ -127,6 +127,30 @@ public class Game {
 		return players.values();
 	}
 	
+	/**Return the nickname currently usable to target the supplied player. This function will be O(n) for large games, but the
+	 * weight of adding another map probably isn't worthwhile given the size of a typical game.
+	 * 
+	 * Throws IllegalArgumentException if the underlying user of the supplied player does not have a nickname stored. 
+	 * This should not happen.*/
+	public String getCurrentStoredNick(Player p){
+		User u = p.getUser();
+		return getCurrentStoredNick(u);
+	}
+	
+	/**Return the nickname currently usable to target the supplied user. This function will be O(n) for large games, but the
+	 * weight of adding another map probably isn't worthwhile given the size of a typical game.
+	 * 
+	 * Throws IllegalArgumentException if the supplied user does not have a nickname stored. This should not happen.*/
+	public String getCurrentStoredNick(User u){
+		for(String e : nicks.keySet()){
+			HashSet<User> s = nicks.get(e);
+			if(s!=null && s.contains(u)){
+				return e;
+			}
+		}
+		throw new IllegalArgumentException("User " + u.getName() + "#" + u.getDiscriminator() + " (ID: " + u.getId()+") does not have a nickname stored.");
+	}
+	
 	/**Ends game prematurely.*/
 	private void cancelGame(){
 		for(User e:players.keySet()){
@@ -174,6 +198,9 @@ public class Game {
 	/**Begin a night.*/
 	private void beginNight(){
 		state=State.NIGHT;
+		for(Player p : players.values()){
+			
+		}
 		postMessage("It is now Night "+cycle+". The night ends in "+NIGHT_TIME+" seconds or when all actions are in.");
 		currentTimer = timerExecutor.schedule(new Runnable(){
 			public @Override void run() {
