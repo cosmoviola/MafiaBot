@@ -13,9 +13,9 @@ public class NaiveCop extends Cop {
 		if(g.getState().equals(Game.State.NIGHT)&&actor.isAlive()){
 			if(actor.isHooked()){
 				actor.privateMessage("Your action failed as you were hooked.");
-			}else if(target!=null){
-				actor.privateMessage(target.getIdentifier()+copResult);
-			}
+			}else target.ifPresent(t -> {
+				actor.privateMessage(t.getIdentifier()+copResult);
+			});
 		}
 	}
 }

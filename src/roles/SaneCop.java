@@ -13,13 +13,13 @@ public class SaneCop extends Cop {
 		if(g.getState().equals(Game.State.NIGHT)&&actor.isAlive()){
 			if(actor.isHooked()){
 				actor.privateMessage("Your action failed as you were hooked.");
-			}else if(target!=null){
-				if(target.isCop()){
-					actor.privateMessage(target.getIdentifier()+copResult);
+			}else target.ifPresent(t -> {
+				if(t.isCop()){
+					actor.privateMessage(t.getIdentifier()+copResult);
 				}else{
-					actor.privateMessage(target.getIdentifier()+wolfResult);
+					actor.privateMessage(t.getIdentifier()+wolfResult);
 				}
-			}
+			});
 		}
 	}
 }

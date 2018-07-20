@@ -17,15 +17,15 @@ public class Wolf extends Role {
 		if(g.getState().equals(Game.State.NIGHT)&&actor.isAlive()){
 			if(actor.isHooked()){
 				actor.privateMessage("Your action failed as you were hooked.");
-			}else if(target!=null){
+			}else target.ifPresent(t-> {
 				if(g.getCycle()==0){
-					target.hook();
+					t.hook();
 				}else{
-					g.killPlayer(target);
-					g.postMessage(target.getIdentifier()+" has been killed. "
-							+ "They were a "+target.getRole().cardFlip()+".");
+					g.killPlayer(t);
+					g.postMessage(t.getIdentifier()+" has been killed. "
+							+ "They were a "+t.getRole().cardFlip()+".");
 				}
-			}
+			});
 		}
 	}
 

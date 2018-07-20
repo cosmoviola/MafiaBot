@@ -2,6 +2,7 @@ package roles;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 
 import game.Game;
 import game.Player;
@@ -10,7 +11,7 @@ public abstract class Role {
 	
 	protected String copResult = " is a cop.";
 	protected String wolfResult = " is the wolf.";
-	protected Player target;
+	protected Optional<Player> target = Optional.empty();
 	protected boolean targetSet = false;
 	protected Player actor;
 	
@@ -25,7 +26,7 @@ public abstract class Role {
 	}
 	
 	public void setTarget(Player p){
-		target = p;
+		target = Optional.of(p);
 		targetSet = true;
 	}
 	
@@ -35,7 +36,7 @@ public abstract class Role {
 	
 	/**Prepares the role for the next cycle by resetting the target to null.*/
 	public void resetTarget(){
-		target = null;
+		target = Optional.empty();
 		targetSet = false;
 	}
 	
