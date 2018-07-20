@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledFuture;
@@ -252,11 +253,13 @@ public class Game {
 		postMessage("The voting period has ended.");
 		HashMap<User, Integer> tally = new HashMap<User, Integer>();
 		for(Vote e:votes.values()){
-			User u = e.getVote();
-			if(e.isVoteSet() && tally.containsKey(u)){
-				tally.put(u, tally.get(u)+1);
-			}else{
-				tally.put(u, 1);
+			if(e.isVoteSet()){
+				User u = e.getVote();
+				if(tally.containsKey(u)){
+					tally.put(u, tally.get(u)+1);
+				}else{
+					tally.put(u, 1);
+				}
 			}
 		}
 		int max = 0;
@@ -362,18 +365,18 @@ public class Game {
 		}
 	}
 	
-	/**Attempts to turn a user-provided target string identifying a player into a User object representing the target. 
-	 * Returns null if no such user uniquely exists. This can happen if two users have the same nickname. */
-	public User getNamedTarget(String target){
+	/**Attempts to turn a user-provided target string identifying a player into a Optional User object representing the target. 
+	 * Returns the empty Optional if no such user uniquely exists. This can happen if two users have the same nickname. */
+	public Optional<User> getNamedTarget(String target){
 		if(names.containsKey(target)){
-			return names.get(target);
+			return Optional.of(names.get(target));
 		}else if(nicks.containsKey(target.toLowerCase())){
 			HashSet<User> set = nicks.get(target.toLowerCase());
 			if(set.size()==1){
-				return set.iterator().next();
+				return Optional.of(set.iterator().next());
 			}
 		}
-		return null;
+		return Optional.empty();
 	}
 	
 	/**Returns a vote for the either the user represented by the input, no lynch, or an unset vote if the input string is meaningless.*/
@@ -382,11 +385,11 @@ public class Game {
 		if(NO_LYNCH_STRINGS.contains(target.replaceAll("\\s", "").toLowerCase())){
 			v.setNoLynch();
 		}else{
-			User u = getNamedTarget(target);
-			if(u == null){
-				v.unsetVote();
+			Optional<User> u = getNamedTarget(target);
+			if(u.isPresent()){
+				v.setVote(u.get());
 			}else{
-				v.setVote(u);
+				v.unsetVote();
 			}
 		}
 		return v;
@@ -443,12 +446,13 @@ public class Game {
 		if(executorRole.getCommands().contains(cmd[0])){
 			String targetStr = String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length));
 			if(IDLE_ACTION_STRINGS.contains(targetStr)){
+				executorRole.setTarget(Optional.empty());
 				executor.privateMessage("You are idling your action.");
 			}else{
-				User target = getNamedTarget(targetStr);
-				if(target != null){
-					executorRole.setTarget(players.get(target));
-					executor.privateMessage("You are targeting "+targetStr+" (Discord ID: "+target.getName()+"#"+target.getDiscriminator()+").");
+				Optional<User> target = getNamedTarget(targetStr);
+				if(target.isPresent()){
+					executorRole.setTarget(target.map(t -> players.get(t)));
+					executor.privateMessage("You are targeting "+targetStr+" (Discord ID: "+target.get().getName()+"#"+target.get().getDiscriminator()+").");
 				}else{
 					executor.privateMessage(targetStr + " does not uniquely identify a valid target. Your previous target is unchanged, if you set one.");
 				}

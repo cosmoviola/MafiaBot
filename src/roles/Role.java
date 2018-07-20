@@ -25,8 +25,8 @@ public abstract class Role {
 		actor = p;
 	}
 	
-	public void setTarget(Player p){
-		target = Optional.of(p);
+	public void setTarget(Optional<Player> p){
+		target = p;
 		targetSet = true;
 	}
 	
