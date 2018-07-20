@@ -196,7 +196,6 @@ public class Game {
 	}
 	
 	/**Begin a night.*/
-	@SuppressWarnings("unchecked")
 	private void beginNight(){
 		state=State.NIGHT;
 		CompletableFuture.allOf(living.stream().map(p -> {
