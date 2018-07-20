@@ -32,6 +32,10 @@ public class Player {
 		return user;
 	}
 	
+	public String getNightMessage(Game g){
+		return role.roleMessageForThisNight(g);
+	}
+	
 	public void setAlignment(Alignment a){
 		alignment = a;
 	}

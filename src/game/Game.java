@@ -25,7 +25,7 @@ public class Game {
 	
 	public static enum State {JOINING, DAY, NIGHT};
 	private State state;
-	private HashSet<Member> members;
+	private HashSet<Member> members = new HashSet<Member>(7);
 	private HashMap<User, Player> players;
 	private HashMap<String, User> names; //gets a user from the user's identifier
 	private HashSet<Player> living;
@@ -196,11 +196,12 @@ public class Game {
 	}
 	
 	/**Begin a night.*/
+	@SuppressWarnings("unchecked")
 	private void beginNight(){
 		state=State.NIGHT;
-		for(Player p : players.values()){
-			
-		}
+		CompletableFuture.allOf(living.stream().map(p -> {
+			return p.privateMessage(p.getNightMessage(this));
+		}).toArray(CompletableFuture[]::new)).join();
 		postMessage("It is now Night "+cycle+". The night ends in "+NIGHT_TIME+" seconds or when all actions are in.");
 		currentTimer = timerExecutor.schedule(new Runnable(){
 			public @Override void run() {
