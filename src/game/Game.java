@@ -77,15 +77,7 @@ public class Game {
 				members.add(mem);
 				players.put(u, p);
 				playerCount++;
-				//add nickname mapping
-				String nick = mem.getEffectiveName().toLowerCase();
-				if(nicks.containsKey(nick)){
-					nicks.get(nick).add(u);
-				}else{
-					HashSet<User> set = new HashSet<User>();
-					set.add(u);
-					nicks.put(nick, set);
-				}
+				addNicknameMapping(mem);
 				postMessage(u.getName()+" has joined the game. "
 						+(GAME_SIZE-playerCount)+" player" + (GAME_SIZE-playerCount == 1 ? "s" : "") + " still needed.");
 			}
@@ -103,15 +95,6 @@ public class Game {
 		User u = mem.getUser();
 		if(state.equals(State.JOINING)){
 			if(players.containsKey(u)){
-				nicks.forEach((k,v) -> {
-					if(v.contains(u)){
-						if(v.size()==1){
-							nicks.remove(k);
-						}else{
-							v.remove(u);
-						}
-					}
-				});
 				names.remove(players.get(u).getIdentifier());
 				players.remove(u);
 				playerCount--;
@@ -150,6 +133,38 @@ public class Game {
 			}
 		}
 		throw new IllegalArgumentException("User " + u.getName() + "#" + u.getDiscriminator() + " (ID: " + u.getId()+") does not have a nickname stored.");
+	}
+	
+	/**Add a nickname mapping to the nickname map for the given Member object.*/
+	public void addNicknameMapping(Member mem){
+		User u = mem.getUser();
+		String nick = mem.getEffectiveName().toLowerCase();
+		if(nicks.containsKey(nick)){
+			nicks.get(nick).add(u);
+		}else{
+			HashSet<User> set = new HashSet<User>();
+			set.add(u);
+			nicks.put(nick, set);
+		}
+	}
+	
+	/**Remove a nickname mapping from the nickname map corresponding to the given user, if it exists.*/
+	public void removeNicknameMapping(User u){
+		nicks.forEach((k,v) -> {
+			if(v.contains(u)){
+				if(v.size()==1){
+					nicks.remove(k);
+				}else{
+					v.remove(u);
+				}
+			}
+		});
+	}
+	
+	/**Update the stored targetable nicknames for each player in the game.*/
+	public void updateNicknames(){
+		nicks.clear();
+		members.forEach(mem -> addNicknameMapping(mem));
 	}
 	
 	/**Ends game prematurely.*/
@@ -199,6 +214,7 @@ public class Game {
 	/**Begin a night.*/
 	private void beginNight(){
 		state=State.NIGHT;
+		updateNicknames();
 		CompletableFuture.allOf(living.stream().map(p -> {
 			return p.privateMessage(p.getNightMessage(this));
 		}).toArray(CompletableFuture[]::new)).join();
@@ -237,6 +253,7 @@ public class Game {
 	private void beginDay(){
 		cycle++;
 		state=State.DAY;
+		updateNicknames();
 		postMessage("It is now Day "+cycle+". "
 				+ "Vote for a player to lynch by submitting '!c5 vote <user>' or '&c5 vote <user>' in this channel. "
 				+ "You have "+DAY_TIME+" seconds.");
