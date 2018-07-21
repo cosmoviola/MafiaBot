@@ -69,7 +69,10 @@ public class C5Bot extends ListenerAdapter{
 			String s = m.getContentRaw();
 			String[] words = s.split(" ");
 			if(words.length>=2){
-				games.get(channels.get(author)).executePrivateCommand(words, author);
+				Game g = games.get(channels.get(author));
+				if(g != null){
+					g.executePrivateCommand(words, author);
+				}
 			}
 		}
 	}
