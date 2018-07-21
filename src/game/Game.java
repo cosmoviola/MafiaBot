@@ -95,6 +95,7 @@ public class Game {
 		User u = mem.getUser();
 		if(state.equals(State.JOINING)){
 			if(players.containsKey(u)){
+				removeNicknameMapping(u);
 				names.remove(players.get(u).getIdentifier());
 				players.remove(u);
 				playerCount--;
