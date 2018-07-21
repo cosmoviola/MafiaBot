@@ -254,9 +254,18 @@ public class Game {
 		cycle++;
 		state=State.DAY;
 		updateNicknames();
-		postMessage("It is now Day "+cycle+". "
+		String dayMessage = "It is now Day "+cycle+". "
 				+ "Vote for a player to lynch by submitting '!c5 vote <user>' or '&c5 vote <user>' in this channel. "
-				+ "You have "+DAY_TIME+" seconds.");
+				+ "You have "+DAY_TIME+" seconds.\n";
+		String targets = "";
+		for(Player p : living){
+			targets += " " + getCurrentStoredNick(p) + " (ID: " + p.getIdentifier() + ")";
+		}
+		if(targets.equals("")){
+			postMessage(dayMessage + "There are no valid targets for the lynch.");
+		}else{
+			postMessage(dayMessage + "The living players are: " + targets + ".");
+		}
 		currentTimer = timerExecutor.schedule(new Runnable(){
 			public @Override void run() {
 				endDay();
