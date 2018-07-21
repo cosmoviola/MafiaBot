@@ -229,7 +229,7 @@ public class Game {
 	
 	/**End a night. Resolves all actions placed.*/
 	private void endNight(){
-		currentTimer.cancel(false);
+		cancelTimer();
 		postMessage("The night has ended.");
 		Iterator<Role> i = roles.iterator();
 		while(i.hasNext()){
@@ -318,7 +318,7 @@ public class Game {
 	
 	/**End the day. Resolves the lynch.*/
 	private void endDay(){
-		currentTimer.cancel(false);
+		cancelTimer();
 		resolveLynch();
 		Alignment a = checkVictory();
 		if(a!=null){
