@@ -264,9 +264,8 @@ public class Game {
 		}, DAY_TIME, TimeUnit.SECONDS);
 	}
 	
-	/**End the day. Resolves the lynch.*/
-	private void endDay(){
-		currentTimer.cancel(false);
+	/**Tallies the user with the most votes and lynches them.*/
+	private void resolveLynch(){
 		postMessage("The voting period has ended.");
 		HashMap<User, Integer> tally = new HashMap<User, Integer>();
 		for(Vote e:votes.values()){
@@ -305,6 +304,12 @@ public class Game {
 			}
 		}
 		votes.clear();
+	}
+	
+	/**End the day. Resolves the lynch.*/
+	private void endDay(){
+		currentTimer.cancel(false);
+		resolveLynch();
 		Alignment a = checkVictory();
 		if(a!=null){
 			endGame(a);
