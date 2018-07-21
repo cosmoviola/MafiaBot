@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -28,21 +29,21 @@ public class Game {
 	public static enum State {JOINING, DAY, NIGHT};
 	private State state;
 	private Set<Member> members = new HashSet<Member>(7);
-	private HashMap<User, Player> players;
-	private HashMap<String, User> names; //gets a user from the user's identifier
+	private Map<User, Player> players;
+	private Map<String, User> names; //gets a user from the user's identifier
 	private Set<Player> living;
 	private int playerCount = 0;
 	private TextChannel channel;
 	private int cycle = 0;
-	private ArrayList<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority. These are where actions are executed.
-	private ArrayList<RoleAlignmentPair> pairsToAssign = new ArrayList<RoleAlignmentPair>(); //these are to be assigned to players
+	private List<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority. These are where actions are executed.
+	private List<RoleAlignmentPair> pairsToAssign = new ArrayList<RoleAlignmentPair>(); //these are to be assigned to players
 	private int GAME_SIZE = 2;
 	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
 	private ScheduledFuture currentTimer;
-	private HashMap<User, Vote> votes = new HashMap<User, Vote>(); //key is the voter, value is that user's vote
+	private Map<User, Vote> votes = new HashMap<User, Vote>(); //key is the voter, value is that user's vote
 	private final List<String> NO_LYNCH_STRINGS = Arrays.asList("nolynch", "novote", "idle");
 	private final List<String> IDLE_ACTION_STRINGS = Arrays.asList("idle");
-	private HashMap<String, HashSet<User>> nicks = new HashMap<String, HashSet<User>>(); //maps a player's nickname to the set of users with that name
+	private Map<String, Set<User>> nicks = new HashMap<String, Set<User>>(); //maps a player's nickname to the set of users with that name
 	private int NIGHT_TIME = 120;
 	private int DAY_TIME = 120;
 	
@@ -129,7 +130,7 @@ public class Game {
 	 * Throws IllegalArgumentException if the supplied user does not have a nickname stored. This should not happen.*/
 	public String getCurrentStoredNick(User u){
 		for(String e : nicks.keySet()){
-			HashSet<User> s = nicks.get(e);
+			Set<User> s = nicks.get(e);
 			if(s!=null && s.contains(u)){
 				return e;
 			}
@@ -213,7 +214,7 @@ public class Game {
 			p.setAlignment(a);
 			r.setActor(p);
 			a.addPlayer(p);
-			messageFutures[i] = p.privateMessage(r.roleMessage() + " "+playersMessage+"\n"+r.winCondition());
+			messageFutures[i] = p.privateMessage(r.roleMessage() + "\n" + r.winCondition());
 			System.out.println(p.getIdentifier()+" "+r.getClass().getName());
 		}
 		try{
@@ -417,7 +418,7 @@ public class Game {
 		if(names.containsKey(target)){
 			return Optional.of(names.get(target));
 		}else if(nicks.containsKey(target.toLowerCase())){
-			HashSet<User> set = nicks.get(target.toLowerCase());
+			Set<User> set = nicks.get(target.toLowerCase());
 			if(set.size()==1){
 				return Optional.of(set.iterator().next());
 			}

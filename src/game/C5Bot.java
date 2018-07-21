@@ -1,6 +1,7 @@
 package game;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import net.dv8tion.jda.core.AccountType;
@@ -16,8 +17,8 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 public class C5Bot extends ListenerAdapter{
 
 	private static String token;
-	private static HashMap<TextChannel, Game> games = new HashMap<TextChannel, Game>();
-	private static HashMap<User, TextChannel> channels = new HashMap<User, TextChannel>();
+	private static Map<TextChannel, Game> games = new HashMap<TextChannel, Game>();
+	private static Map<User, TextChannel> channels = new HashMap<User, TextChannel>();
 	private static User botUser;
 	
 	/**Creates an instance of JDA*/
