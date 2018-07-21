@@ -15,6 +15,8 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import alignments.Alignment;
 import alignments.Self;
@@ -230,13 +232,29 @@ public class Game {
 		beginNight();
 	}
 	
+	/**Send each Player p the result of p.f(this) as a private message, 
+	 * and wait for these messages to all be sent.*/
+	public void messageAll(Collection<Player> c, BiFunction<Player, Game, String> f){
+		messageAll(c, p -> f.apply(p, this));
+	}
+	
+	/**Send each Player p the result of p.f() as a private message, 
+	 * and wait for these messages to all be sent.*/
+	public void messageAll(Collection<Player> c, Function<Player, String> f){
+		CompletableFuture.allOf(living.stream().map(p -> {
+			String s = f.apply(p);
+			if(s.equals("")){
+				return CompletableFuture.completedFuture(true);
+			}
+			return p.privateMessage(f.apply(p));
+		}).toArray(CompletableFuture[]::new)).join();
+	}
+	
 	/**Begin a night.*/
 	private void beginNight(){
 		state=State.NIGHT;
 		updateNicknames();
-		CompletableFuture.allOf(living.stream().map(p -> {
-			return p.privateMessage(p.getNightMessage(this));
-		}).toArray(CompletableFuture[]::new)).join();
+		messageAll(living, Player::getNightMessage);
 		postMessage("It is now Night "+cycle+". The night ends in "+NIGHT_TIME+" seconds or when all actions are in.");
 		currentTimer = timerExecutor.schedule(new Runnable(){
 			public @Override void run() {
@@ -253,6 +271,7 @@ public class Game {
 		while(i.hasNext()){
 			i.next().doAction(this);
 		}
+		messageAll(living, Player::getResultsMessage);
 		i = roles.iterator();
 		while(i.hasNext()){ //this is a separate loop in case a target is needed for another role.
 			i.next().resetTarget();

@@ -1,4 +1,6 @@
 package game;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -11,6 +13,7 @@ public class Player {
 	private User user;
 	private Role role;
 	private String identifier;
+	private List<String> results = new LinkedList<String>();
 	private Alignment alignment;
 	private boolean isAlive = true;
 	private boolean hooked = false;
@@ -68,6 +71,18 @@ public class Player {
 				t -> future.completeExceptionally(new CompletionException(new Exception("Could not send message.")))),
 			x -> future.completeExceptionally(new CompletionException(new Exception("Could not get private channel."))));
 		return future;
+	}
+	
+	public void appendResult(String s){
+		results.add(s);
+	}
+	
+	public void resetResults(){
+		results.clear();
+	}
+	
+	public String getResultsMessage(){
+		return String.join("\n", results);
 	}
 	
 	public void kill(){
