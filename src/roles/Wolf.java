@@ -44,14 +44,11 @@ public class Wolf extends Role {
 			beginning = "It is Night "+g.getCycle()+". Message me 'kill <user>' to kill target user.";
 		}
 		Collection<Player> validTargets = getValidTargets(g);
-		String targets = "";
-		for(Player p : validTargets){
-			targets += " " + g.getCurrentStoredNick(p) + " (ID: " + p.getIdentifier() + ")";
-		}
+		String targets = g.formValidTargetsString(validTargets);
 		if(targets.equals("")){
 			return beginning;
 		}
-		return beginning + " You may target:" + targets + ".";
+		return beginning + " You may target: " + targets + ".";
 	}
 	
 	@Override

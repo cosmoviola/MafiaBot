@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledFuture;
@@ -26,10 +27,10 @@ public class Game {
 	
 	public static enum State {JOINING, DAY, NIGHT};
 	private State state;
-	private HashSet<Member> members = new HashSet<Member>(7);
+	private Set<Member> members = new HashSet<Member>(7);
 	private HashMap<User, Player> players;
 	private HashMap<String, User> names; //gets a user from the user's identifier
-	private HashSet<Player> living;
+	private Set<Player> living;
 	private int playerCount = 0;
 	private TextChannel channel;
 	private int cycle = 0;
@@ -176,6 +177,23 @@ public class Game {
 		C5Bot.removeGame(channel);
 	}
 	
+	/**Returns a string containing the nicknames and identifiers of the players in the provided set, delimited by commas.*/
+	public String formValidTargetsString(Collection<Player> collection){
+		StringBuilder sb = new StringBuilder(64);//number of characters needed is unknown, but likely more than the default 16
+		for(Player p: collection){
+			sb.append(" ")
+			  .append(getCurrentStoredNick(p))
+			  .append(" (ID: ")
+			  .append(p.getIdentifier())
+			  .append("),");
+		}
+		if(sb.length() == 0){
+			return "";
+		}else{
+			return sb.substring(1, sb.length()-1);
+		}
+	}
+	
 	/**Set up game and assign roles. Begin the first night.*/
 	private void beginGame(){
 		cancelTimer();
@@ -184,10 +202,7 @@ public class Game {
 		twoPlayerTestRoles();
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(players.values());
 		Collections.shuffle(shufflePlayers);
-		String playersMessage = "The players are:";
-		for(Player p: players.values()){
-			playersMessage+=" "+p.getIdentifier();
-		}
+		String playersMessage = "The players are: " + formValidTargetsString(players.values());
 		CompletableFuture<Boolean>[] messageFutures = new CompletableFuture[GAME_SIZE];
 		for(int i=0; i<GAME_SIZE; i++){
 			RoleAlignmentPair pair = pairsToAssign.get(i);
@@ -260,10 +275,7 @@ public class Game {
 		String dayMessage = "It is now Day "+cycle+". "
 				+ "Vote for a player to lynch by submitting '!c5 vote <user>' or '&c5 vote <user>' in this channel. "
 				+ "You have "+DAY_TIME+" seconds.\n";
-		String targets = "";
-		for(Player p : living){
-			targets += " " + getCurrentStoredNick(p) + " (ID: " + p.getIdentifier() + ")";
-		}
+		String targets = formValidTargetsString(living);
 		if(targets.equals("")){
 			postMessage(dayMessage + "There are no valid targets for the lynch.");
 		}else{
