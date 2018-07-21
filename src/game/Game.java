@@ -208,7 +208,9 @@ public class Game {
 			cancelGame();
 			throw e;
 		}
-		postMessage("The game begins."+playersMessage+".");
+		postMessage("The game begins." 
+		            + playersMessage
+		            + ".\nNote that targeting the nickname of a player is case-insensitive, while targeting their ID is case-sensitive.");
 		beginNight();
 	}
 	
