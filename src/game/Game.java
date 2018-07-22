@@ -47,7 +47,7 @@ public class Game {
 	private final List<String> NO_LYNCH_STRINGS = Arrays.asList("nolynch", "novote", "idle");
 	private final List<String> IDLE_ACTION_STRINGS = Arrays.asList("idle");
 	private Map<String, Set<User>> nicks = new HashMap<>(); //maps a player's nickname to the set of users with that name
-	private List results = new LinkedList<>();
+	private List<String> results = new LinkedList<>();
 	private int NIGHT_TIME = 120;
 	private int DAY_TIME = 120;
 	
