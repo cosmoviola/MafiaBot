@@ -218,11 +218,11 @@ public class Game {
 	private void beginGame(){
 		cancelTimer();
 		//role assignment
-		living = new HashSet<Player>(players.values());
+		living = new HashSet<Player>(getPlayers());
 		twoPlayerTestRoles();
-		ArrayList<Player> shufflePlayers = new ArrayList<Player>(players.values());
+		ArrayList<Player> shufflePlayers = new ArrayList<Player>(getPlayers());
 		Collections.shuffle(shufflePlayers);
-		String playersMessage = "The players are: " + formValidTargetsString(players.values());
+		String playersMessage = "The players are: " + formValidTargetsString(getPlayers());
 		CompletableFuture<Boolean>[] messageFutures = new CompletableFuture[GAME_SIZE];
 		for(int i=0; i<GAME_SIZE; i++){
 			RoleAlignmentPair pair = pairsToAssign.get(i);
@@ -287,7 +287,7 @@ public class Game {
 			i.next().doAction(this);
 		}
 		messageAll(living, Player::getResultsMessage);
-		for(Player e:players.values()){
+		for(Player e:getPlayers()){
 			e.nightReset();
 		}
 		Alignment a = checkVictory();
