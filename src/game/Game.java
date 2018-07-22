@@ -607,14 +607,7 @@ public class Game {
 		if(state != State.NIGHT){
 			return false;
 		}
-		for(Player p: getPlayers()){
-			if(p.isAlive()){
-				if(!p.getRole().isTargetSet()){
-					return false;
-				}
-			}
-		}
-		return true;
+		return !getPlayers().stream().anyMatch(p -> p.isAlive() && !p.getRole().isTargetSet());
 	}
 	
 	private class RoleAlignmentPair{
