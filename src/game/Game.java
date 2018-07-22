@@ -242,10 +242,6 @@ public class Game {
 	 * and wait for these messages to all be sent.*/
 	public void messageAll(Collection<Player> c, Function<Player, String> f){
 		CompletableFuture.allOf(living.stream().map(p -> {
-			String s = f.apply(p);
-			if(s.equals("")){
-				return CompletableFuture.completedFuture(true);
-			}
 			return p.privateMessage(f.apply(p));
 		}).toArray(CompletableFuture[]::new)).join();
 	}
@@ -563,7 +559,9 @@ public class Game {
 	
 	/**Send a message to the text channel this game is taking place in.*/
 	public void postMessage(String s){
-		channel.sendMessage(s).queue();
+		if(!s.equals("")){
+			channel.sendMessage(s).queue();
+		}
 	}
 	
 	/**Returns the current state of the game.*/

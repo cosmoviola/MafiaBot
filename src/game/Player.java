@@ -64,6 +64,9 @@ public class Player {
 	}
 	
 	public CompletableFuture<Boolean> privateMessage(String s){
+		if(s.equals("")){
+			return CompletableFuture.completedFuture(true);
+		}
 		CompletableFuture<Boolean> future = new CompletableFuture<Boolean>();
 		user.openPrivateChannel().queue(
 			channel -> channel.sendMessage(s).queue(
