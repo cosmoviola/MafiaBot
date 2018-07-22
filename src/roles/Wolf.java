@@ -22,7 +22,7 @@ public class Wolf extends Role {
 					t.hook();
 				}else{
 					g.killPlayer(t);
-					g.postMessage(t.getIdentifier()+" has been killed. "
+					g.appendChannelResult(t.getIdentifier()+" has been killed. "
 							+ "They were a "+t.getRole().cardFlip()+".");
 				}
 			});

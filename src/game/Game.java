@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,22 +31,23 @@ public class Game {
 	
 	public static enum State {JOINING, DAY, NIGHT};
 	private State state;
-	private Set<Member> members = new HashSet<Member>(7);
+	private Set<Member> members = new HashSet<>(7);
 	private Map<User, Player> players;
 	private Map<String, User> names; //gets a user from the user's identifier
 	private Set<Player> living;
 	private int playerCount = 0;
 	private TextChannel channel;
 	private int cycle = 0;
-	private List<Role> roles = new ArrayList<Role>(5); //add roles in order of decreasing priority. These are where actions are executed.
-	private List<RoleAlignmentPair> pairsToAssign = new ArrayList<RoleAlignmentPair>(); //these are to be assigned to players
+	private List<Role> roles = new ArrayList<>(5); //add roles in order of decreasing priority. These are where actions are executed.
+	private List<RoleAlignmentPair> pairsToAssign = new ArrayList<>(); //these are to be assigned to players
 	private int GAME_SIZE = 2;
 	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
 	private ScheduledFuture currentTimer;
-	private Map<User, Vote> votes = new HashMap<User, Vote>(); //key is the voter, value is that user's vote
+	private Map<User, Vote> votes = new HashMap<>(); //key is the voter, value is that user's vote
 	private final List<String> NO_LYNCH_STRINGS = Arrays.asList("nolynch", "novote", "idle");
 	private final List<String> IDLE_ACTION_STRINGS = Arrays.asList("idle");
-	private Map<String, Set<User>> nicks = new HashMap<String, Set<User>>(); //maps a player's nickname to the set of users with that name
+	private Map<String, Set<User>> nicks = new HashMap<>(); //maps a player's nickname to the set of users with that name
+	private List results = new LinkedList<>();
 	private int NIGHT_TIME = 120;
 	private int DAY_TIME = 120;
 	
@@ -197,6 +199,21 @@ public class Game {
 		}
 	}
 	
+	/**Append a result to the list of results to be displayed in the channel for the game.*/
+	public void appendChannelResult(String s){
+		results.add(s);
+	}
+	
+	/**Clear the channel results stored for this game.*/
+	public void clearChannelResults(){
+		results.clear();
+	}
+	
+	/**Publish the channel results stored for this game.*/
+	public void publishChannelResults(){
+		postMessage(String.join("\n", results));
+	}
+	
 	/**Set up game and assign roles. Begin the first night.*/
 	private void beginGame(){
 		cancelTimer();
@@ -226,9 +243,9 @@ public class Game {
 			cancelGame();
 			throw e;
 		}
-		postMessage("The game begins." 
-		            + playersMessage
-		            + ".\nNote that targeting the nickname of a player is case-insensitive, while targeting their ID is case-sensitive.");
+		appendChannelResult("The game begins." 
+		                    + playersMessage
+		                    + ".\nNote that targeting the nickname of a player is case-insensitive, while targeting their ID is case-sensitive.");
 		beginNight();
 	}
 	
@@ -251,7 +268,9 @@ public class Game {
 		state=State.NIGHT;
 		updateNicknames();
 		messageAll(living, Player::getNightMessage);
-		postMessage("It is now Night "+cycle+". The night ends in "+NIGHT_TIME+" seconds or when all actions are in.");
+		appendChannelResult("It is now Night "+cycle+". The night ends in "+NIGHT_TIME+" seconds or when all actions are in.");
+		publishChannelResults();
+		clearChannelResults();
 		currentTimer = timerExecutor.schedule(new Runnable(){
 			public @Override void run() {
 				endNight();
@@ -262,7 +281,7 @@ public class Game {
 	/**End a night. Resolves all actions placed.*/
 	private void endNight(){
 		cancelTimer();
-		postMessage("The night has ended.");
+		appendChannelResult("The night has ended.");
 		Iterator<Role> i = roles.iterator();
 		while(i.hasNext()){
 			i.next().doAction(this);
@@ -289,10 +308,12 @@ public class Game {
 				+ "You have "+DAY_TIME+" seconds.\n";
 		String targets = formValidTargetsString(living);
 		if(targets.equals("")){
-			postMessage(dayMessage + "There are no valid targets for the lynch.");
+			appendChannelResult(dayMessage + "There are no valid targets for the lynch.");
 		}else{
-			postMessage(dayMessage + "The living players are: " + targets + ".");
+			appendChannelResult(dayMessage + "The living players are: " + targets + ".");
 		}
+		publishChannelResults();
+		clearChannelResults();
 		currentTimer = timerExecutor.schedule(new Runnable(){
 			public @Override void run() {
 				endDay();
@@ -302,7 +323,7 @@ public class Game {
 	
 	/**Tallies the user with the most votes and lynches them.*/
 	private void resolveLynch(){
-		postMessage("The voting period has ended.");
+		appendChannelResult("The voting period has ended.");
 		HashMap<User, Integer> tally = new HashMap<User, Integer>();
 		for(Vote e:votes.values()){
 			if(e.isVoteSet()){
@@ -328,15 +349,15 @@ public class Game {
 			}
 		}
 		if(currentLynch == null){
-			postMessage("No one was lynched.");
+			appendChannelResult("No one was lynched.");
 		}else{
 			Player p = players.get(currentLynch);
 			if(living.contains(p)){
 				killPlayer(p);
-				postMessage(p.getIdentifier()+" was lynched. "
+				appendChannelResult(p.getIdentifier()+" was lynched. "
 						+ "They were a "+p.getRole().cardFlip()+".");
 			}else{
-				postMessage("You tried to lynch "+p.getIdentifier()+", but they were already dead.");
+				appendChannelResult("You tried to lynch "+p.getIdentifier()+", but they were already dead.");
 			}
 		}
 		votes.clear();
@@ -378,7 +399,9 @@ public class Game {
 		}else{
 			message = "No one wins.";
 		}
-		postMessage(message);
+		appendChannelResult(message);
+		publishChannelResults();
+		clearChannelResults();
 		for(User e:players.keySet()){
 			C5Bot.removeUserFromUserList(e, channel);
 		}
