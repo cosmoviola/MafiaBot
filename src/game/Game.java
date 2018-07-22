@@ -268,10 +268,6 @@ public class Game {
 			i.next().doAction(this);
 		}
 		messageAll(living, Player::getResultsMessage);
-		i = roles.iterator();
-		while(i.hasNext()){ //this is a separate loop in case a target is needed for another role.
-			i.next().resetTarget();
-		}
 		for(Player e:players.values()){
 			e.nightReset();
 		}

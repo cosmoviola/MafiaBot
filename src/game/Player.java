@@ -98,5 +98,6 @@ public class Player {
 	
 	public void nightReset(){
 		hooked = false;
+		role.resetTarget();
 	}
 }
