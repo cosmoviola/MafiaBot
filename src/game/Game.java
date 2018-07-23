@@ -246,6 +246,11 @@ public class Game {
 		appendChannelResult("The game begins. " 
 		                    + playersMessage
 		                    + ".\nNote that targeting the nickname of a player is case-insensitive, while targeting their ID is case-sensitive.");
+		StringBuilder alignmentsString = new StringBuilder("The factions in this game are: ");
+		for(Alignment a: Alignment.getAllAlignments()){
+			alignmentsString.append(a.getName()).append(", ");
+		}
+		appendChannelResult(alignmentsString.substring(0, alignmentsString.length()-2) + ".");
 		beginNight();
 	}
 	
