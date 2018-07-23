@@ -2,6 +2,7 @@ package roles;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import game.Game;
 import game.Player;
@@ -46,8 +47,8 @@ public abstract class Cop extends Role {
 	}
 
 	@Override
-	public HashSet<String> getCommands() {
-		HashSet<String> s = new HashSet<String>();
+	public Set<String> getCommands() {
+		Set<String> s = new HashSet<String>();
 		s.add("check");
 		return s;
 	}

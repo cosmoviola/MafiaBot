@@ -2,6 +2,7 @@ package roles;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import game.Game;
 import game.Player;
@@ -69,8 +70,8 @@ public class Wolf extends Role {
 	}
 
 	@Override
-	public HashSet<String> getCommands() {
-		HashSet<String> s = new HashSet<String>();
+	public Set<String> getCommands() {
+		Set<String> s = new HashSet<String>();
 		s.add("hook");
 		s.add("kill");
 		return s;
