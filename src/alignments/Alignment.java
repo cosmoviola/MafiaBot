@@ -63,6 +63,9 @@ public abstract class Alignment {
 		return alignments.values();
 	}
 	
-	/**Returs if this faction wins this game.*/
+	/**Returns if this faction wins this game.*/
 	public abstract boolean checkVictory(Game g);
+	
+	/**Returns a string saying what the player's win condition is.*/
+	public abstract String winCondition();
 }

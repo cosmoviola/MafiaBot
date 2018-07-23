@@ -62,11 +62,6 @@ public class Wolf extends Role {
 		g.getPlayers().removeIf((p-> !canTarget(p)));
 		return players;
 	}
-
-	@Override
-	public String winCondition() {
-		return "You win when you are the last player standing.";
-	}
 	
 	@Override
 	public String cardFlip() {

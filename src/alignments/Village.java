@@ -18,4 +18,9 @@ public class Village extends Alignment {
 		}
 		return true;
 	}
+	
+	@Override
+	public String winCondition() {
+		return "You win when all threats to your faction are eliminated.";
+	}
 }

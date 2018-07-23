@@ -23,5 +23,10 @@ public class Self extends Alignment {
 		}
 		return false;
 	}
+	
+	@Override
+	public String winCondition() {
+		return "You win when you are the last player standing.";
+	}
 
 }

@@ -48,8 +48,6 @@ public abstract class Role {
 	
 	public abstract Collection<Player> getValidTargets(Game g);
 	
-	public abstract String winCondition();
-	
 	public abstract String cardFlip();
 	
 	public abstract HashSet<String> getCommands();

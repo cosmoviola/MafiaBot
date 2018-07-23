@@ -39,11 +39,6 @@ public abstract class Cop extends Role {
 		g.getPlayers().removeIf((p-> !canTarget(p)));
 		return players;
 	}
-	
-	@Override
-	public String winCondition() {
-		return "You win when the wolf is dead.";
-	}
 
 	@Override
 	public String cardFlip() {

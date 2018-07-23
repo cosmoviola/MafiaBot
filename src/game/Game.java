@@ -233,7 +233,7 @@ public class Game {
 			p.setAlignment(a);
 			r.setActor(p);
 			a.addPlayer(p);
-			messageFutures[i] = p.privateMessage(r.roleMessage() + "\n" + r.winCondition());
+			messageFutures[i] = p.privateMessage(r.roleMessage() + "\n" + a.winCondition());
 			System.out.println(p.getIdentifier()+" "+r.getClass().getName());
 		}
 		try{
