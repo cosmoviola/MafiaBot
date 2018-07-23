@@ -243,7 +243,7 @@ public class Game {
 			cancelGame();
 			throw e;
 		}
-		appendChannelResult("The game begins." 
+		appendChannelResult("The game begins. " 
 		                    + playersMessage
 		                    + ".\nNote that targeting the nickname of a player is case-insensitive, while targeting their ID is case-sensitive.");
 		beginNight();
