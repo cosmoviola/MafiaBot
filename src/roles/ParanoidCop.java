@@ -17,5 +17,10 @@ public class ParanoidCop extends Cop {
 				actor.appendResult(t.getIdentifier()+wolfResult);
 			});
 		}
+	}
+
+	@Override
+	public String getTrueName() {
+		return "Paranoid Cop";
 	}	
 }

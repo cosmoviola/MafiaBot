@@ -76,4 +76,9 @@ public class Wolf extends Role {
 		s.add("kill");
 		return s;
 	}
+
+	@Override
+	public String getTrueName() {
+		return "Wolf";
+	}
 }

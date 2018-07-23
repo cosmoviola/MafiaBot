@@ -251,6 +251,11 @@ public class Game {
 			alignmentsString.append(a.getName()).append(", ");
 		}
 		appendChannelResult(alignmentsString.substring(0, alignmentsString.length()-2) + ".");
+		StringBuilder rolesString = new StringBuilder("The roles in this game are: ");
+		for(Role r: roles){
+			rolesString.append(r.getTrueName()).append(", ");
+		}
+		appendChannelResult(rolesString.substring(0, rolesString.length()-2) + ".");
 		beginNight();
 	}
 	

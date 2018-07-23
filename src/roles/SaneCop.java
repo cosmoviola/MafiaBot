@@ -22,4 +22,9 @@ public class SaneCop extends Cop {
 			});
 		}
 	}
+
+	@Override
+	public String getTrueName() {
+		return "Sane Cop";
+	}
 }

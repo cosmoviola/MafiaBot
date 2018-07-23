@@ -64,4 +64,9 @@ public abstract class Role {
 	/**Returns the set of valid commands for this role.*/
 	public abstract Set<String> getCommands();
 	
+	/**Returns the true role name of this role.
+	 * This differs from cardFlip() as cardFlip may return false information.
+	 */
+	public abstract String getTrueName();
+	
 }

@@ -22,4 +22,9 @@ public class InsaneCop extends Cop {
 			});
 		}
 	}
+
+	@Override
+	public String getTrueName() {
+		return "Insane Cop";
+	}
 }

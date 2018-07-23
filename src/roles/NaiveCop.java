@@ -18,4 +18,9 @@ public class NaiveCop extends Cop {
 			});
 		}
 	}
+
+	@Override
+	public String getTrueName() {
+		return "Naive Cop";
+	}
 }
