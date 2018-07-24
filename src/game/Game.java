@@ -84,7 +84,7 @@ public class Game {
 				players.put(u, p);
 				playerCount++;
 				addNicknameMapping(mem);
-				postMessage(u.getName()+" has joined the game. "
+				postMessage(mem.getEffectiveName()+" has joined the game. "
 						+(GAME_SIZE-playerCount)+" player" + (GAME_SIZE-playerCount == 1 ? "s" : "") + " still needed.");
 			}
 			if(playerCount==GAME_SIZE){
@@ -107,7 +107,7 @@ public class Game {
 				playerCount--;
 				C5Bot.removeUserFromUserList(u, channel);
 				members.remove(mem);
-				postMessage(u.getName()+" has left the game. "
+				postMessage(mem.getEffectiveName()+" has left the game. "
 							+(GAME_SIZE-playerCount)+" player" + (GAME_SIZE-playerCount == 1 ? "s" : "") + " needed.");
 			}
 		}

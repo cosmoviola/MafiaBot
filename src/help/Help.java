@@ -36,6 +36,6 @@ public class Help {
 	}
 	
 	public static String defaultHelpCommand(){
-		return "TODO: write help command.";
+		return "Use the command 'help role <rolename>' to see what that role does.";
 	}
 }
