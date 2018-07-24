@@ -1,9 +1,11 @@
 package game;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import help.Help;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -47,16 +49,23 @@ public class C5Bot extends ListenerAdapter{
 		TextChannel channel = m.getTextChannel();
 		String[] words = s.split(" ");
 		if(words.length>=2&&(words[0].toLowerCase().equals("!c5")||words[0].toLowerCase().equals("&c5"))){
-			if(words[1].toLowerCase().equals("start")){
-				if(games.containsKey(channel)){
-					postMessage("There is already a c5 game running in this channel.", channel);
-				}else{
-					Game g = new Game(channel);
-					games.put(channel, g);
-					g.addPlayer(m.getMember());
-				}
-			}else if(games.containsKey(channel)){
-				games.get(channel).executeChannelCommand(words, m.getMember());
+			switch(words[1].toLowerCase()){
+				case "start":
+					if(games.containsKey(channel)){
+						postMessage("There is already a c5 game running in this channel.", channel);
+					}else{
+						Game g = new Game(channel);
+						games.put(channel, g);
+						g.addPlayer(m.getMember());
+					}
+					break;
+				case "help":
+					postMessage(Help.parseHelpCommand(Arrays.copyOfRange(words, 2, words.length)), channel);
+					break;
+				default: 
+					if(games.containsKey(channel)){
+						games.get(channel).executeChannelCommand(words, m.getMember());
+					}
 			}
 		}
 	}
@@ -64,8 +73,7 @@ public class C5Bot extends ListenerAdapter{
 	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event){
 		User author = event.getAuthor();
-		if(author.equals(botUser)){	
-		}else{
+		if(!author.equals(botUser)){	
 			Message m = event.getMessage();
 			String s = m.getContentRaw();
 			String[] words = s.split(" ");
