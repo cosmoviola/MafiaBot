@@ -46,7 +46,8 @@ public class Game {
 	private Map<User, Vote> votes = new HashMap<>(); //key is the voter, value is that user's vote
 	private final List<String> NO_LYNCH_STRINGS = Arrays.asList("nolynch", "novote", "idle");
 	private final List<String> IDLE_ACTION_STRINGS = Arrays.asList("idle");
-	private Map<String, Set<User>> nicks = new HashMap<>(); //maps a player's nickname to the set of users with that name
+	private Map<String, Set<User>> nicks = new HashMap<>(); //maps a player's nickname to the set of users with that name, case-insensitively
+	private Map<User, String> storedNicks = new HashMap<>(); //maps a user to its nickname, case-sensitively
 	private List<String> results = new LinkedList<>();
 	private int NIGHT_TIME = 120;
 	private int DAY_TIME = 120;
@@ -118,34 +119,22 @@ public class Game {
 		return players.values();
 	}
 	
-	/**Return the nickname currently usable to target the supplied player. This function will be O(n) for large games, but the
-	 * weight of adding another map probably isn't worthwhile given the size of a typical game.
-	 * 
-	 * Throws IllegalArgumentException if the underlying user of the supplied player does not have a nickname stored. 
-	 * This should not happen.*/
+	/**Return the nickname currently usable to target the supplied player, case-sensitively.*/
 	public String getCurrentStoredNick(Player p){
 		User u = p.getUser();
 		return getCurrentStoredNick(u);
 	}
 	
-	/**Return the nickname currently usable to target the supplied user. This function will be O(n) for large games, but the
-	 * weight of adding another map probably isn't worthwhile given the size of a typical game.
-	 * 
-	 * Throws IllegalArgumentException if the supplied user does not have a nickname stored. This should not happen.*/
+	/**Return the nickname currently usable to target the supplied user, case-sensitively.*/
 	public String getCurrentStoredNick(User u){
-		for(String e : nicks.keySet()){
-			Set<User> s = nicks.get(e);
-			if(s!=null && s.contains(u)){
-				return e;
-			}
-		}
-		throw new IllegalArgumentException("User " + u.getName() + "#" + u.getDiscriminator() + " (ID: " + u.getId()+") does not have a nickname stored.");
+		return storedNicks.get(u);
 	}
 	
 	/**Add a nickname mapping to the nickname map for the given Member object.*/
 	public void addNicknameMapping(Member mem){
 		User u = mem.getUser();
-		String nick = mem.getEffectiveName().toLowerCase();
+		String nickCaseSensitive = mem.getEffectiveName();
+		String nick = nickCaseSensitive.toLowerCase();
 		if(nicks.containsKey(nick)){
 			nicks.get(nick).add(u);
 		}else{
@@ -153,6 +142,7 @@ public class Game {
 			set.add(u);
 			nicks.put(nick, set);
 		}
+		storedNicks.put(u, nickCaseSensitive);
 	}
 	
 	/**Remove a nickname mapping from the nickname map corresponding to the given user, if it exists.*/
@@ -166,6 +156,7 @@ public class Game {
 				}
 			}
 		});
+		storedNicks.remove(u);
 	}
 	
 	/**Update the stored targetable nicknames for each player in the game.*/
