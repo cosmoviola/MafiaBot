@@ -40,7 +40,7 @@ public class Game {
 	private int cycle = 0;
 	private List<Role> roles = new ArrayList<>(5); //add roles in order of decreasing priority. These are where actions are executed.
 	private List<RoleAlignmentPair> pairsToAssign = new ArrayList<>(); //these are to be assigned to players
-	private int GAME_SIZE = 2;
+	private int GAME_SIZE = 5;
 	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
 	private ScheduledFuture currentTimer;
 	private Map<User, Vote> votes = new HashMap<>(); //key is the voter, value is that user's vote
@@ -85,7 +85,7 @@ public class Game {
 				playerCount++;
 				addNicknameMapping(mem);
 				postMessage(mem.getEffectiveName()+" has joined the game. "
-						+(GAME_SIZE-playerCount)+" player" + (GAME_SIZE-playerCount == 1 ? "s" : "") + " still needed.");
+						+(GAME_SIZE-playerCount)+" player" + (GAME_SIZE-playerCount == 1 ? "" : "s") + " still needed.");
 			}
 			if(playerCount==GAME_SIZE){
 				postMessage("Enough players have joined the game. Game starting.");
@@ -108,7 +108,7 @@ public class Game {
 				C5Bot.removeUserFromUserList(u, channel);
 				members.remove(mem);
 				postMessage(mem.getEffectiveName()+" has left the game. "
-							+(GAME_SIZE-playerCount)+" player" + (GAME_SIZE-playerCount == 1 ? "s" : "") + " needed.");
+							+(GAME_SIZE-playerCount)+" player" + (GAME_SIZE-playerCount == 1 ? "" : "s") + " needed.");
 			}
 		}
 	}
@@ -219,7 +219,7 @@ public class Game {
 		cancelTimer();
 		//role assignment
 		living = new HashSet<Player>(getPlayers());
-		twoPlayerTestRoles();
+		c5roles();
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(getPlayers());
 		Collections.shuffle(shufflePlayers);
 		String playersMessage = "The players are: " + formValidTargetsString(getPlayers());
