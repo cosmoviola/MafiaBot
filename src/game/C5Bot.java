@@ -47,41 +47,55 @@ public class C5Bot extends ListenerAdapter{
 		Message m = event.getMessage();
 		String s = m.getContentRaw();
 		TextChannel channel = m.getTextChannel();
-		String[] words = s.split(" ");
-		if(words.length>=2&&(words[0].toLowerCase().equals("!c5")||words[0].toLowerCase().equals("&c5"))){
-			switch(words[1].toLowerCase()){
-				case "start":
-					if(games.containsKey(channel)){
-						postMessage("There is already a c5 game running in this channel.", channel);
-					}else{
-						Game g = new Game(channel);
-						games.put(channel, g);
-						g.addPlayer(m.getMember());
-					}
-					break;
-				case "help":
-					postMessage(Help.parseHelpCommand(Arrays.copyOfRange(words, 2, words.length)), channel);
-					break;
-				default: 
-					if(games.containsKey(channel)){
-						games.get(channel).executeChannelCommand(words, m.getMember());
-					}
+		try{
+			String[] words = s.split(" ");
+			if(words.length>=2&&(words[0].toLowerCase().equals("!c5")||words[0].toLowerCase().equals("&c5"))){
+				switch(words[1].toLowerCase()){
+					case "start":
+						if(games.containsKey(channel)){
+							postMessage("There is already a c5 game running in this channel.", channel);
+						}else{
+							Game g = new Game(channel);
+							games.put(channel, g);
+							g.addPlayer(m.getMember());
+						}
+						break;
+					case "help":
+						postMessage(Help.parseHelpCommand(Arrays.copyOfRange(words, 2, words.length)), channel);
+						break;
+					default: 
+						if(games.containsKey(channel)){
+							games.get(channel).executeChannelCommand(words, m.getMember());
+						}
+				}
 			}
+		}catch(Exception e){
+			User u = m.getAuthor();
+			System.out.println("User " + u.getName() + "#" + u.getDiscriminator() 
+							   + " (ID: " + u.getId()+") sent '" + s 
+							   + "' in " + channel.getName() + " (ID: " + channel.getId()+"), causing an exception.");
+			throw e;
 		}
 	}
 	
 	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event){
 		User author = event.getAuthor();
-		if(!author.equals(botUser)){	
+		if(!author.equals(botUser)){
 			Message m = event.getMessage();
 			String s = m.getContentRaw();
-			String[] words = s.split(" ");
-			if(words.length>=2){
-				Game g = games.get(channels.get(author));
-				if(g != null){
-					g.executePrivateCommand(words, author);
+			try{
+				String[] words = s.split(" ");
+				if(words.length>=2){
+					Game g = games.get(channels.get(author));
+					if(g != null){
+						g.executePrivateCommand(words, author);
+					}
 				}
+			}catch(Exception e){
+				System.out.println("User " + author.getName() + "#" + author.getDiscriminator() 
+				   + " (ID: " + author.getId()+") sent '" + s 
+				   + "' in a private message, causing an exception.");
 			}
 		}
 	}
