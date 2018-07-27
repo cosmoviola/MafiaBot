@@ -505,7 +505,7 @@ public class Game {
 					break;
 				}
 				String target = String.join(" ", Arrays.copyOfRange(cmd, 2, cmd.length));
-				if(living.contains(players.get(author))){
+				if(players.get(author).isAlive()){
 					Vote v = getVoteFromTarget(target);
 					if(v.isVoteSet()){
 						placeVote(author, v);
