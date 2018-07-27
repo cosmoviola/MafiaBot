@@ -18,6 +18,7 @@ public class Help {
 	public static String parseRoleInfoCommand(String[] cmd){
 		String rolename = String.join("", cmd).toLowerCase();
 		switch(rolename){
+			case "cop":
 			case "sanecop":
 				return "Targets a user at night and is told whether the target is aligned with them. Does not know they are sane.";
 			case "insanecop":
@@ -36,6 +37,8 @@ public class Help {
 	}
 	
 	public static String defaultHelpCommand(){
-		return "Use the command 'help role <rolename>' to see what that role does.";
+		return "C5 is a format of mafia with 5 players. Four cops are aligned, a Sane Cop, an Insane Cop, "
+				+ "a Paranoid Cop, and a Naive Cop, in killing a wolf."
+				+ "\n\nUse the command 'help role <rolename>' to see what that role does.";
 	}
 }
