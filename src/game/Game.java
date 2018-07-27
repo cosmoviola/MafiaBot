@@ -364,10 +364,11 @@ public class Game {
 			Player p = players.get(currentLynch);
 			if(living.contains(p)){
 				killPlayer(p);
-				appendChannelResult(p.getIdentifier()+" was lynched. "
+				appendChannelResult(getCurrentStoredNick(p.getUser()) + " (ID: " + p.getIdentifier() + ") was lynched. "
 						+ "They were a "+p.getRole().cardFlip()+".");
 			}else{
-				appendChannelResult("You tried to lynch "+p.getIdentifier()+", but they were already dead.");
+				appendChannelResult("You tried to lynch "+getCurrentStoredNick(p.getUser()) 
+									+ " (ID: " + p.getIdentifier() + "), but they were already dead.");
 			}
 		}
 		votes.clear();
@@ -392,20 +393,21 @@ public class Game {
 		Collection<Player> c = a.getMembers();
 		Iterator<Player> i = c.iterator();
 		if(c.size()==1){
-			message = i.next().getIdentifier()+" (the "+a.getName()+") has won!";
+			Player p = i.next();
+			message = getCurrentStoredNick(p.getUser()) + " (ID: " + p.getIdentifier() + ") "+" (the "+a.getName()+") has won!";
 		}else if(i.hasNext()==true){
 			boolean next = true;
 			message = "";
 			while(next){
 				Player e = i.next();
 				if(i.hasNext()){
-					message+=e.getIdentifier()+", ";
+					message+=getCurrentStoredNick(e.getUser()) + " (ID: " + e.getIdentifier() + "), ";
 				}else{
-					message+="and "+e.getIdentifier();
+					message+="and "+getCurrentStoredNick(e.getUser()) + " (ID: " + e.getIdentifier() + ") ";
 					next=false;
 				}
 			}
-			message +=" (the "+a.getName()+") have won!";
+			message +="(the "+a.getName()+") have won!";
 		}else{
 			message = "No one wins.";
 		}
