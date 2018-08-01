@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledFuture;
@@ -18,7 +20,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
+import actions.Action;
 import alignments.Alignment;
 import alignments.Self;
 import alignments.Village;
@@ -38,9 +40,10 @@ public class Game {
 	private int playerCount = 0;
 	private TextChannel channel;
 	private int cycle = 0;
-	private List<Role> roles = new ArrayList<>(5); //add roles in order of decreasing priority. These are where actions are executed.
+	private List<Role> roles = new ArrayList<>(); //contains roles for the game
+	private List<Action> actions;
 	private List<RoleAlignmentPair> pairsToAssign = new ArrayList<>(); //these are to be assigned to players
-	private int GAME_SIZE = 5;
+	private int GAME_SIZE = 2;
 	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
 	private ScheduledFuture currentTimer;
 	private Map<User, Vote> votes = new HashMap<>(); //key is the voter, value is that user's vote
@@ -75,10 +78,10 @@ public class Game {
 		if(state.equals(State.JOINING)){
 			if(players.containsKey(u)){
 				postMessage(u.getName()+" has already joined this game.");
-			}else if(C5Bot.checkUserInUserList(u)){
+			}else if(MafiaBot.checkUserInUserList(u)){
 				postMessage(u.getName()+" is aleady in a game of c5 and cannot join.");
 			}else{
-				C5Bot.addUserToUserList(u, channel);
+				MafiaBot.addUserToUserList(u, channel);
 				Player p = new Player(u);
 				names.put(p.getIdentifier(), u);
 				members.add(mem);
@@ -106,7 +109,7 @@ public class Game {
 				names.remove(players.get(u).getIdentifier());
 				players.remove(u);
 				playerCount--;
-				C5Bot.removeUserFromUserList(u, channel);
+				MafiaBot.removeUserFromUserList(u, channel);
 				members.remove(mem);
 				postMessage(mem.getEffectiveName()+" has left the game. "
 							+(GAME_SIZE-playerCount)+" player" + (GAME_SIZE-playerCount == 1 ? "" : "s") + " needed.");
@@ -168,9 +171,9 @@ public class Game {
 	/**Ends game prematurely.*/
 	private void cancelGame(){
 		for(User e:players.keySet()){
-			C5Bot.removeUserFromUserList(e, channel);
+			MafiaBot.removeUserFromUserList(e, channel);
 		}
-		C5Bot.removeGame(channel);
+		MafiaBot.removeGame(channel);
 	}
 	
 	/**Returns a string containing the nicknames and identifiers of the players in the provided set, delimited by commas.*/
@@ -210,7 +213,7 @@ public class Game {
 		cancelTimer();
 		//role assignment
 		living = new HashSet<Player>(getPlayers());
-		c5roles();
+		twoPlayerTestRoles();
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(getPlayers());
 		Collections.shuffle(shufflePlayers);
 		String playersMessage = "The players are: " + formValidTargetsString(getPlayers());
@@ -283,9 +286,8 @@ public class Game {
 	private void endNight(){
 		cancelTimer();
 		appendChannelResult("The night has ended.");
-		Iterator<Role> i = roles.iterator();
-		while(i.hasNext()){
-			i.next().doAction(this);
+		for(Action a: actions){
+			a.doAction(this);
 		}
 		messageAll(living, Player::getResultsMessage);
 		for(Player e:getPlayers()){
@@ -406,9 +408,9 @@ public class Game {
 		publishChannelResults();
 		clearChannelResults();
 		for(User e:players.keySet()){
-			C5Bot.removeUserFromUserList(e, channel);
+			MafiaBot.removeUserFromUserList(e, channel);
 		}
-		C5Bot.removeGame(channel);
+		MafiaBot.removeGame(channel);
 	}
 	
 	/**Places a vote by voter onto voted.*/
@@ -527,35 +529,53 @@ public class Game {
 	public void executePrivateCommand(String[] cmd, User author){
 		Player executor = players.get(author);
 		Role executorRole = executor.getRole();
-		if(executorRole.getCommands().contains(cmd[0])){
-			String targetStr = String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length));
-			if(IDLE_ACTION_STRINGS.contains(targetStr)){
-				executorRole.setTarget(Optional.empty());
-				executor.privateMessage("You are idling your action.");
-			}else{
-				Optional<User> target = getNamedTarget(targetStr);
-				if(target.isPresent()){
-					executorRole.setTarget(target.map(t -> players.get(t)));
-					executor.privateMessage("You are targeting "+targetStr+" (Discord ID: "+target.get().getName()+"#"+target.get().getDiscriminator()+").");
+		String keyword = cmd[0];
+		if(executorRole.getCommands().contains(keyword)){
+			if(executorRole.isActive(keyword, this)){
+				String targetStr = String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length));
+				if(IDLE_ACTION_STRINGS.contains(targetStr)){
+					executorRole.setTarget(keyword, Optional.empty());
+					executor.privateMessage("You are idling your action.");
 				}else{
-					executor.privateMessage(targetStr + " does not uniquely identify a valid target. Your previous target is unchanged, if you set one.");
+					Optional<User> target = getNamedTarget(targetStr);
+					if(target.isPresent()){
+						executorRole.setTarget(keyword, target.map(t -> players.get(t)));
+						executor.privateMessage("You are targeting "+targetStr+" (Discord ID: "+target.get().getName()+"#"+target.get().getDiscriminator()+").");
+					}else{
+						executor.privateMessage(targetStr + " does not uniquely identify a valid target. Your previous target is unchanged, if you set one.");
+					}
 				}
-			}
-			if(allTargetsSet()){
-				endNight();
+				if(allTargetsSet()){
+					endNight();
+				}
+			}else{
+				executor.privateMessage("You cannot use that command right now.");
 			}
 		}else{
 			executor.privateMessage("That is not a valid command.");
 		}
 	}
 	
+	/**Form the actions set from the actions each Role in roles has, sorted by priority.*/
+	private static List<Action> formActionsSet(List<Role> roles){
+		List<Action> result = new ArrayList<>();
+		for(Role r : roles){
+			result.addAll(r.getActions());
+		}
+		result.sort((Action a1, Action a2) -> {
+			return Integer.compare(a1.getPriority(), a2.getPriority());
+		});
+		return result;
+	}
+	
 	/**Initialize game to use the roles in a c5 game.*/
 	public void c5roles(){
-		roles.add(new Wolf());
-		roles.add(new SaneCop());
-		roles.add(new InsaneCop());
-		roles.add(new NaiveCop());
-		roles.add(new ParanoidCop());
+		roles.add(new Wolf(1, 1));
+		roles.add(new SaneCop(2));
+		roles.add(new InsaneCop(2));
+		roles.add(new NaiveCop(2));
+		roles.add(new ParanoidCop(2));
+		actions = formActionsSet(roles);
 		Alignment cops = new Village("cops");
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(1), cops));
@@ -566,14 +586,16 @@ public class Game {
 	
 	/**One player game for testing purposes.*/
 	public void onePlayerTestRoles(){
-		roles.add(new Wolf());
+		roles.add(new Wolf(1, 1));
+		actions = formActionsSet(roles);
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
 	}
 	
 	/**Two player game for testing purposes.*/
 	public void twoPlayerTestRoles(){
-		roles.add(new Wolf());
-		roles.add(new SaneCop());
+		roles.add(new Wolf(1, 1));
+		roles.add(new SaneCop(2));
+		actions = formActionsSet(roles);
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
 		Alignment cops = new Village("cops");
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(1),cops));
@@ -610,7 +632,7 @@ public class Game {
 		if(state != State.NIGHT){
 			return false;
 		}
-		return !getPlayers().stream().anyMatch(p -> p.isAlive() && !p.getRole().isTargetSet());
+		return !getPlayers().stream().anyMatch(p -> p.isAlive() && !p.getRole().allTargetsSet(this));
 	}
 	
 	private class RoleAlignmentPair{

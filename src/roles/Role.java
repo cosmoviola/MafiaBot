@@ -1,9 +1,14 @@
 package roles;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
+import actions.Action;
 import game.Game;
 import game.Player;
 
@@ -11,62 +16,81 @@ import game.Player;
  * for performing that role's actions.*/
 public abstract class Role {
 	
-	protected String copResult = " is a cop.";
-	protected String wolfResult = " is the wolf.";
 	protected Optional<Player> target = Optional.empty();
-	protected boolean targetSet = false;
 	protected Player actor;
-	
-	public Role(){
-		
-	}
-
-	/**Perform the action for this role.*/
-	public abstract void doAction(Game g);
+	Map<String, Consumer<Optional<Player>>> keywords = new HashMap<>();
+	Map<String, Function<Game, Boolean>> keywordActive = new HashMap<>();
+	Set<Action> actions = new HashSet<>();
 	
 	/**Set which Player has this role.*/
 	public void setActor(Player p){
 		actor = p;
+		for(Action a : actions){
+			a.setActor(p);
+		}
 	}
 	
-	/**Set the target for this role.*/
-	public void setTarget(Optional<Player> p){
-		target = p;
-		targetSet = true;
+	/**Set the target for the action specified by the given keyword.*/
+	public void setTarget(String key, Optional<Player> p){
+		keywords.get(key).accept(p);
 	}
 	
-	/**Returns true iff a target has been set for this night.*/
-	public boolean isTargetSet(){
-		return targetSet;
+	/**Returns true iff all targets have been set for this night.*/
+	public boolean allTargetsSet(Game g){
+		return actions.stream().allMatch(a -> a.allTargetsSet() || (!a.isActive(g)));
 	}
 	
 	/**Prepares the role for the next cycle by resetting the target to null.*/
-	public void resetTarget(){
-		target = Optional.empty();
-		targetSet = false;
+	public void reset(){
+		for(Action a: actions){
+			a.reset();
+		}
 	}
 	
 	/**Returns the message for describing this role to its Player.*/
 	public abstract String roleMessage();
 	
 	/**Returns the instructions on how to use the role on the current cycle.*/
-	public abstract String roleMessageForThisNight(Game g);
-	
-	/**Returns true iff this role can target the supplied Player.*/
-	public abstract boolean canTarget(Player p);
-	
-	/**Returns a Collection of all the Players which are valid targets of this role.*/
-	public abstract Collection<Player> getValidTargets(Game g);
+	public String roleMessageForThisNight(Game g){
+		String initial = "It is Night "+g.getCycle()+".\n";
+		if(actions.stream().allMatch(a -> !a.isActive(g))){
+			return initial + "You have no actions to perform tonight.";
+		}
+		StringBuilder message = new StringBuilder(initial);
+		for(Action a : actions){
+			String s = a.actionMessageForThisNight(g);
+			if(!s.equals("")){
+				message.append(s).append("\n");
+			}
+		}
+		String result = message.toString();
+		if(result.equals(initial)){
+			return result + "You have no valid targets for your actions.";
+		}
+		return result.substring(0, result.length()-1);
+	}
 	
 	/**Returns the role name which displays upon the death of this role.*/
 	public abstract String cardFlip();
 	
 	/**Returns the set of valid commands for this role.*/
-	public abstract Set<String> getCommands();
+	public Set<String> getCommands(){
+		return keywords.keySet();
+	}
 	
 	/**Returns the true role name of this role.
 	 * This differs from cardFlip() as cardFlip may return false information.
 	 */
 	public abstract String getTrueName();
+	
+	/**Return the set of actions for this role.*/
+	public Set<Action> getActions(){
+		return actions;
+	}
+	
+	/**Returns whether the supplied keyword is currently active.*/
+	public boolean isActive(String keyword, Game g){
+		return keywordActive.get(keyword).apply(g);
+	}
 	
 }

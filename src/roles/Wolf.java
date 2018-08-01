@@ -1,33 +1,20 @@
 package roles;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-import game.Game;
-import game.Player;
+import actions.Hook;
+import actions.Kill;
 
 public class Wolf extends Role {
-
-	public Wolf() {
-		
-	}
-
-	@Override
-	public void doAction(Game g) {
-		if(g.getState().equals(Game.State.NIGHT)&&actor.isAlive()){
-			if(actor.isHooked()){
-				actor.appendResult("Your action failed as you were hooked.");
-			}else target.ifPresent(t-> {
-				if(g.getCycle()==0){
-					t.hook();
-				}else{
-					g.killPlayer(t);
-					g.appendChannelResult(g.getCurrentStoredNick(t) + " (ID: " + t.getIdentifier() + ")" + " has been killed. "
-							+ "They were a "+t.getRole().cardFlip()+".");
-				}
-			});
-		}
+	
+	/**Construct a c5-style Wolf with the given priorities.*/
+	public Wolf(int hookPriority, int killPriority) {
+		Hook hook = new Hook(hookPriority, g -> g.getCycle() == 0);
+		Kill kill = new Kill(killPriority, g -> g.getCycle() != 0);
+		hook.addKeywordMappings(keywords);
+		hook.addKeywordActiveMappings(keywordActive);
+		kill.addKeywordMappings(keywords);
+		kill.addKeywordActiveMappings(keywordActive);
+		actions.add(hook);
+		actions.add(kill);
 	}
 
 	@Override
@@ -37,44 +24,8 @@ public class Wolf extends Role {
 	}
 	
 	@Override
-	public String roleMessageForThisNight(Game g){
-		String beginning;
-		if(g.getCycle() == 0){
-			beginning = "It is Night 0. Message me 'hook <user>' to hook target user.";
-		}else{
-			beginning = "It is Night "+g.getCycle()+". Message me 'kill <user>' to kill target user.";
-		}
-		Collection<Player> validTargets = getValidTargets(g);
-		String targets = g.formValidTargetsString(validTargets);
-		if(targets.equals("")){
-			return beginning;
-		}
-		return beginning + " You may target: " + targets + ".";
-	}
-	
-	@Override
-	public boolean canTarget(Player p){
-		return p.isAlive();
-	}
-	
-	@Override
-	public Collection<Player> getValidTargets(Game g){
-		Collection<Player> players = g.getPlayers();
-		g.getPlayers().removeIf((p-> !canTarget(p)));
-		return players;
-	}
-	
-	@Override
 	public String cardFlip() {
 		return "Wolf";
-	}
-
-	@Override
-	public Set<String> getCommands() {
-		Set<String> s = new HashSet<String>();
-		s.add("hook");
-		s.add("kill");
-		return s;
 	}
 
 	@Override

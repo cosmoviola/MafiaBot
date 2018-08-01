@@ -1,22 +1,11 @@
 package roles;
 
-import game.Game;
+import actions.AlignmentCop;
 
 public class ParanoidCop extends Cop {
 
-	public ParanoidCop() {
-
-	}
-
-	@Override
-	public void doAction(Game g) {
-		if(g.getState().equals(Game.State.NIGHT)&&actor.isAlive()){
-			if(actor.isHooked()){
-				actor.appendResult("Your action failed as you were hooked.");
-			}else target.ifPresent(t ->{
-				actor.appendResult(t.getIdentifier()+wolfResult);
-			});
-		}
+	public ParanoidCop(int p) {
+		super(p, AlignmentCop.Sanity.PARANOID);
 	}
 
 	@Override

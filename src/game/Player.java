@@ -71,9 +71,9 @@ public class Player {
 		return alignment;
 	}
 	
-	/**Returns true iff this Player is aligned with the cops.*/
-	public boolean isCop(){
-		return alignment.equals(Alignment.getAlignment("cops"));
+	/**Returns true iff this Player is aligned with the supplied Player.*/
+	public boolean isAligned(Player p){
+		return alignment.equals(p.getAlignment());
 	}
 	
 	/**Sends the input string as a private message to this Player,
@@ -120,7 +120,7 @@ public class Player {
 	/**Prepare this Player for the next day, resetting all necessary fields.*/
 	public void nightReset(){
 		hooked = false;
-		role.resetTarget();
+		role.reset();
 		resetResults();
 	}
 }

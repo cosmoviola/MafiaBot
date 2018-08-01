@@ -1,10 +1,7 @@
 package game;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-
 import help.Help;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -16,7 +13,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public class C5Bot extends ListenerAdapter{
+public class MafiaBot extends ListenerAdapter{
 
 	private static String token;
 	private static Map<TextChannel, Game> games = new HashMap<TextChannel, Game>();
@@ -33,7 +30,7 @@ public class C5Bot extends ListenerAdapter{
 		try{
             JDA jda = new JDABuilder(AccountType.BOT)
                     .setToken(token)
-                    .addEventListener(new C5Bot())
+                    .addEventListener(new MafiaBot())
                     .buildBlocking();
             botUser = jda.getSelfUser();
         }
@@ -96,6 +93,7 @@ public class C5Bot extends ListenerAdapter{
 				System.out.println("User " + author.getName() + "#" + author.getDiscriminator() 
 				   + " (ID: " + author.getId()+") sent '" + s 
 				   + "' in a private message, causing an exception.");
+				throw e;
 			}
 		}
 	}
