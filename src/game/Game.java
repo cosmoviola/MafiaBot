@@ -570,7 +570,7 @@ public class Game {
 	
 	/**Initialize game to use the roles in a c5 game.*/
 	public void c5roles(){
-		roles.add(new Wolf(1, 1));
+		roles.add(new C5Wolf(1, 1));
 		roles.add(new SaneCop(2));
 		roles.add(new InsaneCop(2));
 		roles.add(new NaiveCop(2));
@@ -586,14 +586,14 @@ public class Game {
 	
 	/**One player game for testing purposes.*/
 	public void onePlayerTestRoles(){
-		roles.add(new Wolf(1, 1));
+		roles.add(new C5Wolf(1, 1));
 		actions = formActionsSet(roles);
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
 	}
 	
 	/**Two player game for testing purposes.*/
 	public void twoPlayerTestRoles(){
-		roles.add(new Wolf(1, 1));
+		roles.add(new C5Wolf(1, 1));
 		roles.add(new SaneCop(2));
 		actions = formActionsSet(roles);
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));

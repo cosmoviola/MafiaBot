@@ -13,7 +13,7 @@ public abstract class Cop extends Role {
 
 	@Override
 	public String roleMessage() {
-		return "You are a cop. At night, message me check <user> to determine user's alignment. "
+		return "You are a cop. Every night, you may determine one target user's alignment. "
 				+ "Be warned: you do not know your sanity."; 
 	}
 

@@ -3,10 +3,10 @@ package roles;
 import actions.Hook;
 import actions.Kill;
 
-public class Wolf extends Role {
+public class C5Wolf extends Role {
 	
 	/**Construct a c5-style Wolf with the given priorities.*/
-	public Wolf(int hookPriority, int killPriority) {
+	public C5Wolf(int hookPriority, int killPriority) {
 		Hook hook = new Hook(hookPriority, g -> g.getCycle() == 0);
 		Kill kill = new Kill(killPriority, g -> g.getCycle() != 0);
 		hook.addKeywordMappings(keywords);
@@ -19,8 +19,8 @@ public class Wolf extends Role {
 
 	@Override
 	public String roleMessage() {
-		return "You are the wolf. At night on cycle 0, message me 'hook <user>' to hook user. "
-				+ "On following nights, message me 'kill <user>' to kill user.";
+		return "You are the wolf. At night on cycle 0, you may hook one target user. "
+				+ "On following nights, you may kill one target user.";
 	}
 	
 	@Override
