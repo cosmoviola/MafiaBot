@@ -1,22 +1,15 @@
 package actions;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import game.Game;
 import game.Player;
 
-public class AlignmentCop extends Action {
+public class AlignmentCop extends SingleTargetableKeywordAction {
 	
-	private Optional<Player> target = Optional.empty();
-	private String keyword;
 	public static enum Sanity {SANE, INSANE, NAIVE, PARANOID};
 	private Sanity sanity;
-	private boolean targetSet = false;
 
 	public AlignmentCop(int p, Function<Game, Boolean> f){
 		this(p, f, "check", Sanity.SANE);
@@ -28,12 +21,10 @@ public class AlignmentCop extends Action {
 	
 	public AlignmentCop(int p, Function<Game, Boolean> f, String str){
 		this(p, f, str, Sanity.SANE);
-		keyword = str;
 	}
 	
 	public AlignmentCop(int p, Function<Game, Boolean> f, String str, Sanity san){
-		super(p, f);
-		keyword = str;
+		super(p, f, str);
 		sanity = san;
 	}
 
@@ -86,55 +77,8 @@ public class AlignmentCop extends Action {
 		return "Message me 'check <user>' to determine user's alignment. You may target: " + targets + ".";
 	}
 	
-	/**Returns a Collection of all the Players which are valid targets of this action.*/
-	public Collection<Player> getValidTargets(Game g){
-		Collection<Player> targets = new HashSet<>();
-		for(Player p : g.getPlayers()){
-			if(canTarget(p)){
-				targets.add(p);
-			}
-		}
-		return targets;
-	}
-	
 	/**Returns true iff this role can target the supplied Player.*/
 	public boolean canTarget(Player p){
 		return p.isAlive();
 	}
-
-	@Override
-	public void addKeywordMappings(Map<String, Consumer<Optional<Player>>> map){
-		if(map.containsKey(keyword)){
-			throw new IllegalArgumentException(keyword + " is already a keyword of this map.");
-		}
-		map.put(keyword, p -> {
-			target = p;
-			targetSet = true;
-		});
-	}
-	
-	@Override
-	public void addKeywordActiveMappings(Map<String, Function<Game, Boolean>> map) {
-		if(map.containsKey(keyword)){
-			throw new IllegalArgumentException(keyword + " is already a keyword of this map.");
-		}
-		map.put(keyword, isActive);
-	}
-
-	@Override
-	public boolean allTargetsSet() {
-		return targetSet;
-	}
-
-	@Override
-	public void reset() {
-		target = Optional.empty();
-		targetSet = false;
-	}
-
-	@Override
-	public void setActor(Player p) {
-		actor = p;
-	}
-
 }

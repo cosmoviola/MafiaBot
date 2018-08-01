@@ -20,7 +20,9 @@ public abstract class Action {
 	}
 	
 	/**Set the actor for this action.*/
-	public abstract void setActor(Player p);
+	public void setActor(Player p){
+		actor = p;
+	}
 	
 	/**Perform this action.*/
 	public abstract void doAction(Game g);
