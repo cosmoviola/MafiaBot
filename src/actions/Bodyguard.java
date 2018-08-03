@@ -6,23 +6,28 @@ import java.util.function.Function;
 import game.Game;
 import game.Player;
 
-public class Hook extends SingleTargetableKeywordAction {
-
-	public Hook(int p, Function<Game, Boolean> f) {
-		this(p, f, "hook");
-	}
+public class Bodyguard extends SingleTargetableKeywordAction {
 	
-	public Hook(int p, Function<Game, Boolean> f, String s){
+	public Bodyguard(int p, Function<Game, Boolean> f) {
+		super(p, f, "bodyguard");
+	}
+
+	public Bodyguard(int p, Function<Game, Boolean> f, String s) {
 		super(p, f, s);
+	}
+
+	@Override
+	public boolean canTarget(Player p) {
+		return p.isAlive();
 	}
 
 	@Override
 	public void doAction(Game g) {
 		if(g.getState().equals(Game.State.NIGHT) && actor.isAlive() && isActive(g)){
 			if(actor.isHooked()){
-				actor.appendResult("Your hook action failed.");
+				actor.appendResult("Your bodyguard action failed.");
 			}else target.ifPresent(t-> {
-				t.hook();
+				t.bodyguard();
 			});
 		}
 	}
@@ -32,7 +37,7 @@ public class Hook extends SingleTargetableKeywordAction {
 		if(!isActive(g)){
 			return "";
 		}
-		String beginning = "Message me '"+keyword+" <user>' to hook target user.";
+		String beginning = "Message me '"+keyword+" <user>' to bodyguard target user.";
 		Collection<Player> validTargets = getValidTargets(g);
 		String targets = g.formValidTargetsString(validTargets);
 		if(targets.equals("")){
@@ -40,9 +45,5 @@ public class Hook extends SingleTargetableKeywordAction {
 		}
 		return beginning + " You may target: " + targets + ".";
 	}
-	
-	/**Returns true iff this role can target the supplied Player.*/
-	public boolean canTarget(Player p){
-		return p.isAlive();
-	}
+
 }

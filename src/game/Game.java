@@ -522,10 +522,7 @@ public class Game {
 		}	
 	}
 	
-	/**Executes the command contained in cmd. 
-	 * In a later implementation, commands will fetch an Action object, which will determine
-	 * what action is done. For now, all commands have the same effect.
-	 */
+	/**Executes the command contained in cmd.*/
 	public void executePrivateCommand(String[] cmd, User author){
 		Player executor = players.get(author);
 		Role executorRole = executor.getRole();

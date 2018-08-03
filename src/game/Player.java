@@ -19,6 +19,7 @@ public class Player {
 	private Alignment alignment;
 	private boolean isAlive = true;
 	private boolean hooked = false;
+	private boolean bodyguarded = false;
 	
 	/**Construct a Player for User u.*/
 	public Player(User u){
@@ -122,5 +123,15 @@ public class Player {
 		hooked = false;
 		role.reset();
 		resetResults();
+	}
+
+	/**Returns true iff this Player was bodyguarded this cycle.*/
+	public boolean isBodyguarded() {
+		return bodyguarded;
+	}
+
+	/**Bodyguard this player this cycle.*/
+	public void bodyguard() {
+		bodyguarded = true;
 	}
 }

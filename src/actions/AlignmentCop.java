@@ -32,16 +32,12 @@ public class AlignmentCop extends SingleTargetableKeywordAction {
 	public void doAction(Game g){
 		String friendlyResult = " is aligned with you.";
 		String hostileResult = " is hostile to you.";
-		System.out.println("Enter doAction cop");
 		if(g.getState().equals(Game.State.NIGHT) && actor.isAlive() && isActive(g)){
-			System.out.println("Can perform cop");
 			if(actor.isHooked()){
-				System.out.println("Hooked cop");
-				actor.appendResult("Your action failed as you were hooked.");
+				actor.appendResult("Your cop action failed.");
 			}else target.ifPresent(t -> {
 				switch(sanity){
 				case SANE:
-					System.out.println("Checking cop");
 					if(actor.isAligned(t)){
 						actor.appendResult(t.getIdentifier()+friendlyResult);
 					}else{
@@ -70,7 +66,6 @@ public class AlignmentCop extends SingleTargetableKeywordAction {
 	public String actionMessageForThisNight(Game g){
 		Collection<Player> validTargets = getValidTargets(g);
 		String targets = g.formValidTargetsString(validTargets);
-		System.out.println(targets);
 		if(targets.equals("")){
 			return "You do not have any valid targets for your action.";
 		}
