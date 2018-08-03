@@ -1,0 +1,27 @@
+package roles;
+
+public class Bodyguard extends Role {
+	
+	public Bodyguard(int p){
+		actions.Bodyguard bg = new actions.Bodyguard(p, g -> true);
+		bg.addKeywordMappings(keywords);
+		bg.addKeywordActiveMappings(keywordActive);
+		actions.add(bg);
+	}
+
+	@Override
+	public String roleMessage() {
+		return "You are a bodyguard. Every night, you may target a user to protect them from killers.";
+	}
+
+	@Override
+	public String cardFlip() {
+		return "Bodyguard";
+	}
+
+	@Override
+	public String getTrueName() {
+		return "Bodyguard";
+	}
+
+}
