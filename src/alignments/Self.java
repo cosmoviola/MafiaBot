@@ -1,5 +1,6 @@
 package alignments;
 
+import java.util.Optional;
 import game.Game;
 import game.Player;
 
@@ -27,6 +28,11 @@ public class Self extends Alignment {
 	@Override
 	public String winCondition() {
 		return "You win when you are the last player standing.";
+	}
+
+	@Override
+	public void setTarget(String key, Player actor, Optional<Player> target) {
+		throw new RuntimeException("This alignment does not have any actions.");
 	}
 
 }

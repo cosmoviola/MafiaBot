@@ -1,5 +1,6 @@
 package alignments;
 
+import java.util.Optional;
 import game.Game;
 import game.Player;
 
@@ -16,11 +17,21 @@ public class Village extends Alignment {
 				return false;
 			}
 		}
-		return true;
+		for(Player e: this.members){
+			if(e.isAlive()){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
 	public String winCondition() {
 		return "You win when all threats to your faction are eliminated.";
+	}
+	
+	@Override
+	public void setTarget(String key, Player actor, Optional<Player> target) {
+		throw new RuntimeException("This alignment does not have any actions.");
 	}
 }

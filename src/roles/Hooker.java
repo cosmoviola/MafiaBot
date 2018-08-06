@@ -6,9 +6,9 @@ public class Hooker extends Role {
 	
 	public Hooker(int p) {
 		Hook hook = new Hook(p, g -> true);
-		hook.addKeywordMappings(keywords);
-		hook.addKeywordActiveMappings(keywordActive);
-		actions.add(hook);
+		for(String key : hook.getKeywords()){
+			actions.put(key, hook);
+		}
 	}
 
 	@Override

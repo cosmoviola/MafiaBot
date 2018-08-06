@@ -4,9 +4,9 @@ public class Bodyguard extends Role {
 	
 	public Bodyguard(int p){
 		actions.Bodyguard bg = new actions.Bodyguard(p, g -> true);
-		bg.addKeywordMappings(keywords);
-		bg.addKeywordActiveMappings(keywordActive);
-		actions.add(bg);
+		for(String key : bg.getKeywords()){
+			actions.put(key, bg);
+		}
 	}
 
 	@Override

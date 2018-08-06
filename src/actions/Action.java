@@ -1,8 +1,7 @@
 package actions;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.Set;
 import java.util.function.Function;
 
 import game.Game;
@@ -24,6 +23,12 @@ public abstract class Action {
 		actor = p;
 	}
 	
+	/**Set the target for the given keyword.*/
+	public abstract void setTarget(String key, Optional<Player> p);
+	
+	/**Get all valid keywords for this action.*/
+	public abstract Set<String> getKeywords();
+	
 	/**Perform this action.*/
 	public abstract void doAction(Game g);
 	
@@ -34,18 +39,6 @@ public abstract class Action {
 	
 	/**Returns the instructions on how to use this action on the current cycle.*/
 	public abstract String actionMessageForThisNight(Game g);
-	
-	/**Add all keyword mappings for this action to the given map.
-	 * 
-	 * @throws IllegalArgumentException if the map already has a conflicting keyword.
-	 */
-	public abstract void addKeywordMappings(Map<String, Consumer<Optional<Player>>> map);
-	
-	/**Add all keyword active mappings for this action to the given map.
-	 * 
-	 * @throws IllegalArgumentException if the map already has a conflicting keyword.
-	 */
-	public abstract void addKeywordActiveMappings(Map<String, Function<Game, Boolean>> map);
 	
 	/**Return the priority of this action.*/
 	public int getPriority(){

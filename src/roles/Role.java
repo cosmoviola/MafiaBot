@@ -1,13 +1,10 @@
 package roles;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import actions.Action;
 import game.Game;
 import game.Player;
@@ -18,31 +15,29 @@ public abstract class Role {
 	
 	protected Optional<Player> target = Optional.empty();
 	protected Player actor;
-	Map<String, Consumer<Optional<Player>>> keywords = new HashMap<>();
-	Map<String, Function<Game, Boolean>> keywordActive = new HashMap<>();
-	Set<Action> actions = new HashSet<>();
+	Map<String, Action> actions = new HashMap<>();
 	
 	/**Set which Player has this role.*/
 	public void setActor(Player p){
 		actor = p;
-		for(Action a : actions){
+		for(Action a : actions.values()){
 			a.setActor(p);
 		}
 	}
 	
 	/**Set the target for the action specified by the given keyword.*/
 	public void setTarget(String key, Optional<Player> p){
-		keywords.get(key).accept(p);
+		actions.get(key).setTarget(key, p);
 	}
 	
 	/**Returns true iff all targets have been set for this night.*/
 	public boolean allTargetsSet(Game g){
-		return actions.stream().allMatch(a -> a.allTargetsSet() || (!a.isActive(g)));
+		return actions.values().stream().allMatch(a -> a.allTargetsSet() || (!a.isActive(g)));
 	}
 	
 	/**Prepares the role for the next cycle by resetting the target to null.*/
 	public void reset(){
-		for(Action a: actions){
+		for(Action a: actions.values()){
 			a.reset();
 		}
 	}
@@ -53,11 +48,11 @@ public abstract class Role {
 	/**Returns the instructions on how to use the role on the current cycle.*/
 	public String roleMessageForThisNight(Game g){
 		String initial = "It is Night "+g.getCycle()+".\n";
-		if(actions.stream().allMatch(a -> !a.isActive(g))){
+		if(actions.values().stream().allMatch(a -> !a.isActive(g))){
 			return initial + "You have no actions to perform tonight.";
 		}
 		StringBuilder message = new StringBuilder(initial);
-		for(Action a : actions){
+		for(Action a : actions.values()){
 			String s = a.actionMessageForThisNight(g);
 			if(!s.equals("")){
 				message.append(s).append("\n");
@@ -75,22 +70,22 @@ public abstract class Role {
 	
 	/**Returns the set of valid commands for this role.*/
 	public Set<String> getCommands(){
-		return keywords.keySet();
+		return actions.keySet();
 	}
 	
 	/**Returns the true role name of this role.
-	 * This differs from cardFlip() as cardFlip may return false information.
+	 * This differs from cardFlip() as cardFlip() may return false information.
 	 */
 	public abstract String getTrueName();
 	
 	/**Return the set of actions for this role.*/
-	public Set<Action> getActions(){
-		return actions;
+	public Collection<Action> getActions(){
+		return actions.values();
 	}
 	
 	/**Returns whether the supplied keyword is currently active.*/
 	public boolean isActive(String keyword, Game g){
-		return keywordActive.get(keyword).apply(g);
+		return actions.get(keyword).isActive(g);
 	}
 	
 }

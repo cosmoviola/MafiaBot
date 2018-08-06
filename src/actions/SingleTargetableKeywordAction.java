@@ -2,9 +2,8 @@ package actions;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.Set;
 import java.util.function.Function;
 
 import game.Game;
@@ -20,24 +19,20 @@ public abstract class SingleTargetableKeywordAction extends Action {
 		super(p, f);
 		keyword = s;
 	}
-
+	
 	@Override
-	public void addKeywordMappings(Map<String, Consumer<Optional<Player>>> map){
-		if(map.containsKey(keyword)){
-			throw new IllegalArgumentException(keyword + " is already a keyword of this map.");
-		}
-		map.put(keyword, p -> {
+	public void setTarget(String key, Optional<Player> p){
+		if(key.equals(keyword)){
 			target = p;
 			targetSet = true;
-		});
+		}
 	}
 	
 	@Override
-	public void addKeywordActiveMappings(Map<String, Function<Game, Boolean>> map) {
-		if(map.containsKey(keyword)){
-			throw new IllegalArgumentException(keyword + " is already a keyword of this map.");
-		}
-		map.put(keyword, isActive);
+	public Set<String> getKeywords(){
+		Set<String> keywords = new HashSet<String>();
+		keywords.add(keyword);
+		return keywords;
 	}
 
 	@Override
