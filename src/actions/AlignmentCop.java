@@ -69,7 +69,7 @@ public class AlignmentCop extends SingleTargetableKeywordAction {
 		if(targets.equals("")){
 			return "You do not have any valid targets for your action.";
 		}
-		return "Message me 'check <user>' to determine user's alignment. You may target: " + targets + ".";
+		return "Message me '" + keyword + " <user>' to determine user's alignment. You may target: " + targets + ".";
 	}
 	
 	/**Returns true iff this role can target the supplied Player.*/

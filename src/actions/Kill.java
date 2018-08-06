@@ -38,7 +38,7 @@ public class Kill extends SingleTargetableKeywordAction {
 		if(!isActive(g)){
 			return "";
 		}
-		String beginning = "Message me '"+keyword+"' <user>' to kill target user.";
+		String beginning = "Message me '"+keyword+" <user>' to kill target user.";
 		Collection<Player> validTargets = getValidTargets(g);
 		String targets = g.formValidTargetsString(validTargets);
 		if(targets.equals("")){
