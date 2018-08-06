@@ -35,4 +35,14 @@ public class Self extends Alignment {
 		throw new RuntimeException("This alignment does not have any actions.");
 	}
 
+	@Override
+	public String alignmentString(Game g) {
+		return "You are aligned with yourself.";
+	}
+
+	@Override
+	public String alignmentMessageForThisNight(Game g) {
+		return "";
+	}
+
 }

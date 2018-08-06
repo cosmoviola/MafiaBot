@@ -9,8 +9,9 @@ import java.util.Set;
 import actions.Action;
 import game.Game;
 import game.Player;
+import interfaces.ActionManager;
 
-public abstract class Alignment {
+public abstract class Alignment implements ActionManager {
 	
 	protected String name;
 	protected static Map<String, Alignment> alignments = new HashMap<String, Alignment>();
@@ -71,13 +72,19 @@ public abstract class Alignment {
 	/**Returns a string saying what the player's win condition is.*/
 	public abstract String winCondition();
 	
+	/**Returns a string saying what faction the player is aligned with and who is on their team, if the faction is informed.*/
+	public abstract String alignmentString(Game g);
+	
+	/**Returns a string saying information for this alignment specific to this night.*/
+	public abstract String alignmentMessageForThisNight(Game g);
+	
 	/**Returns the set of actions performable by this alignment.*/
 	public Collection<Action> getActions(){
 		return actions.values();
 	}
 	
 	/**Returns the set of keywords for the actions performable by this alignment.*/
-	public Set<String> getKeywords(){
+	public Set<String> getCommands(){
 		return actions.keySet();
 	}
 	
@@ -86,5 +93,27 @@ public abstract class Alignment {
 		Action a = actions.get(key);
 		a.setTarget(key, target);
 		a.setActor(actor);
+	}
+	
+	/**Returns whether the supplied keyword is currently active.*/
+	public boolean isActive(String key, Game g){
+		return actions.get(key).isActive(g);
+	}
+	
+	/**Returns true iff all targets have been set for this night.*/
+	public boolean allTargetsSet(Game g){
+		return actions.values().stream().allMatch(a -> a.allTargetsSet() || (!a.isActive(g)));
+	}
+	
+	/**Prepares this alignment for the next night.*/
+	public void reset(){
+		for(Action a: actions.values()){
+			a.reset();
+		}
+	}
+	
+	/**Get the collection of players who should receive results.*/
+	public Set<Player> getResultRecipients(){
+		return members;
 	}
 }

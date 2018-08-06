@@ -44,7 +44,7 @@ public class Player {
 	
 	/**Returns the message this Player needs from their role.*/
 	public String getNightMessage(Game g){
-		return role.roleMessageForThisNight(g);
+		return role.roleMessageForThisNight(g) + "\n" + alignment.alignmentMessageForThisNight(g);
 	}
 	
 	/**Sets the alignment of this Player to a.*/

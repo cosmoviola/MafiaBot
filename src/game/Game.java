@@ -24,6 +24,7 @@ import actions.Action;
 import alignments.Alignment;
 import alignments.Self;
 import alignments.Village;
+import interfaces.ActionManager;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -227,7 +228,7 @@ public class Game {
 			p.setAlignment(a);
 			r.setActor(p);
 			a.addPlayer(p);
-			messageFutures[i] = p.privateMessage(r.roleMessage() + "\n" + a.winCondition());
+			messageFutures[i] = p.privateMessage(r.roleMessage() + "\n" + a.alignmentString(this) + "\n" + a.winCondition());
 			System.out.println(p.getIdentifier()+" "+r.getClass().getName());
 		}
 		try{
@@ -261,8 +262,8 @@ public class Game {
 	
 	/**Send each Player p the result of p.f() as a private message, 
 	 * and wait for these messages to all be sent.*/
-	public void messageAll(Collection<Player> c, Function<Player, String> f){
-		CompletableFuture.allOf(living.stream().map(p -> {
+	public static void messageAll(Collection<Player> c, Function<Player, String> f){
+		CompletableFuture.allOf(c.stream().map(p -> {
 			return p.privateMessage(f.apply(p));
 		}).toArray(CompletableFuture[]::new)).join();
 	}
@@ -525,19 +526,40 @@ public class Game {
 	/**Executes the command contained in cmd.*/
 	public void executePrivateCommand(String[] cmd, User author){
 		Player executor = players.get(author);
-		Role executorRole = executor.getRole();
-		String keyword = cmd[0];
+		ActionManager executorRole;
+		String keyword;
+		String targetStr;
+		if(cmd[0].equals("team")){
+			if(cmd.length > 2){
+			    keyword = cmd[1];
+			    executorRole = executor.getAlignment();
+			    targetStr = String.join(" ", Arrays.copyOfRange(cmd, 2, cmd.length));
+			}else{
+				executor.privateMessage("Supplied keyword requires an argument.");
+				return;
+			}
+		}else{
+		    executorRole = executor.getRole();
+		    keyword = cmd[0];
+		    targetStr = String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length));
+		}
 		if(executorRole.getCommands().contains(keyword)){
 			if(executorRole.isActive(keyword, this)){
-				String targetStr = String.join(" ", Arrays.copyOfRange(cmd, 1, cmd.length));
+				
 				if(IDLE_ACTION_STRINGS.contains(targetStr)){
-					executorRole.setTarget(keyword, Optional.empty());
+					executorRole.setTarget(keyword, executor, Optional.empty());
 					executor.privateMessage("You are idling your action.");
 				}else{
 					Optional<User> target = getNamedTarget(targetStr);
 					if(target.isPresent()){
-						executorRole.setTarget(keyword, target.map(t -> players.get(t)));
+						executorRole.setTarget(keyword, executor, target.map(t -> players.get(t)));
 						executor.privateMessage("You are targeting "+targetStr+" (Discord ID: "+target.get().getName()+"#"+target.get().getDiscriminator()+").");
+						for(Player p : executorRole.getResultRecipients()){
+							if(!p.equals(executor)){
+								p.privateMessage(getCurrentStoredNick(executor) + " (Discord ID: "+executor.getIdentifier()+") is targeting "
+							                     + targetStr + " (Discord ID: "+target.get().getName()+"#"+target.get().getDiscriminator()+") with your team's " + keyword + ".");
+							}
+						}
 					}else{
 						executor.privateMessage(targetStr + " does not uniquely identify a valid target. Your previous target is unchanged, if you set one.");
 					}

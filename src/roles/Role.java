@@ -2,16 +2,18 @@ package roles;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import actions.Action;
 import game.Game;
 import game.Player;
+import interfaces.ActionManager;
 
 /**A Role represents a role in a game of mafia, and contains methods and fields
  * for performing that role's actions.*/
-public abstract class Role {
+public abstract class Role implements ActionManager {
 	
 	protected Optional<Player> target = Optional.empty();
 	protected Player actor;
@@ -26,8 +28,10 @@ public abstract class Role {
 	}
 	
 	/**Set the target for the action specified by the given keyword.*/
-	public void setTarget(String key, Optional<Player> p){
-		actions.get(key).setTarget(key, p);
+	public void setTarget(String key, Player actor, Optional<Player> target){
+		Action a = actions.get(key);
+		a.setTarget(key, target);
+		a.setActor(actor);
 	}
 	
 	/**Returns true iff all targets have been set for this night.*/
@@ -86,6 +90,13 @@ public abstract class Role {
 	/**Returns whether the supplied keyword is currently active.*/
 	public boolean isActive(String keyword, Game g){
 		return actions.get(keyword).isActive(g);
+	}
+	
+	/**Get the collection of players who should receive results.*/
+	public Set<Player> getResultRecipients(){
+		Set<Player> set = new HashSet<Player>();
+		set.add(actor);
+		return set;
 	}
 	
 }

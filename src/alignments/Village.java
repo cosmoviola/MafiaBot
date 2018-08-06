@@ -34,4 +34,14 @@ public class Village extends Alignment {
 	public void setTarget(String key, Player actor, Optional<Player> target) {
 		throw new RuntimeException("This alignment does not have any actions.");
 	}
+
+	@Override
+	public String alignmentString(Game g) {
+		return "You are aligned with " + this.getName() + ". You do not know your teammates.";
+	}
+
+	@Override
+	public String alignmentMessageForThisNight(Game g) {
+		return "";
+	}
 }
