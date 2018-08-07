@@ -38,6 +38,7 @@ public class Game {
 	private Map<User, Player> players;
 	private Map<String, User> names; //gets a user from the user's identifier
 	private Set<Player> living;
+	protected Map<String, Alignment> alignments = new HashMap<String, Alignment>();
 	private int playerCount = 0;
 	private TextChannel channel;
 	private int cycle = 0;
@@ -242,7 +243,7 @@ public class Game {
 		                    + playersMessage
 		                    + ".\nNote that targeting the nickname of a player is case-insensitive, while targeting their ID is case-sensitive.");
 		StringBuilder alignmentsString = new StringBuilder("The factions in this game are: ");
-		for(Alignment a: Alignment.getAllAlignments()){
+		for(Alignment a: getAllAlignments()){
 			alignmentsString.append(a.getName()).append(", ");
 		}
 		appendChannelResult(alignmentsString.substring(0, alignmentsString.length()-2) + ".");
@@ -293,6 +294,9 @@ public class Game {
 		messageAll(living, Player::getResultsMessage);
 		for(Player e:getPlayers()){
 			e.nightReset();
+		}
+		for(ActionManager a : getAllAlignments()){
+			a.reset();
 		}
 		Alignment a = checkVictory();
 		if(a!=null){
@@ -435,7 +439,7 @@ public class Game {
 	 * If so, returns that alignment. Otherwise, returns null.
 	 * This currently does not support multiple alignments winning.*/
 	private Alignment checkVictory(){
-		Collection<Alignment> alignments = Alignment.getAllAlignments();
+		Collection<Alignment> alignments = getAllAlignments();
 		for(Alignment e: alignments){
 			if(e.checkVictory(this)){
 				return e;
@@ -480,6 +484,16 @@ public class Game {
 			}
 		}
 		return v;
+	}
+	
+	/**Gets the alignment with name n if it exists.*/
+	public Alignment getAlignment(String n){
+		return alignments.get(n);
+	}
+	
+	/**Returns a Collection containing all alignments in the game.*/
+	public Collection<Alignment> getAllAlignments(){
+		return alignments.values();
 	}
 	
 	/**Takes commands in the main text channel and executes them.*/
@@ -575,10 +589,13 @@ public class Game {
 		}
 	}
 	
-	/**Form the actions set from the actions each Role in roles has, sorted by priority.*/
-	private static List<Action> formActionsSet(List<Role> roles){
+	/**Form the actions set from the actions each role and alignment provided has, sorted by priority.*/
+	private static List<Action> formActionsSet(Collection<Role> roles, Collection<Alignment> alignments){
 		List<Action> result = new ArrayList<>();
-		for(Role r : roles){
+		for(ActionManager r : roles){
+			result.addAll(r.getActions());
+		}
+		for(ActionManager r : roles){
 			result.addAll(r.getActions());
 		}
 		result.sort((Action a1, Action a2) -> {
@@ -594,30 +611,38 @@ public class Game {
 		roles.add(new InsaneCop(2));
 		roles.add(new NaiveCop(2));
 		roles.add(new ParanoidCop(2));
-		actions = formActionsSet(roles);
 		Alignment cops = new Village("cops");
-		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
+		alignments.put(cops.getName(), cops);
+		Alignment wolf = new Self("wolf");
+		alignments.put(wolf.getName(), wolf);
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), wolf));
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(1), cops));
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(2), cops));
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(3), cops));
 		pairsToAssign.add(new RoleAlignmentPair(roles.get(4), cops));
+		actions = formActionsSet(roles, alignments.values());
 	}
 	
 	/**One player game for testing purposes.*/
 	public void onePlayerTestRoles(){
 		roles.add(new C5Wolf(1, 1));
-		actions = formActionsSet(roles);
-		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
+		Alignment wolf = new Self("wolf");
+		alignments.put(wolf.getName(), wolf);
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), wolf));
+		actions = formActionsSet(roles, alignments.values());
 	}
 	
 	/**Two player game for testing purposes.*/
 	public void twoPlayerTestRoles(){
 		roles.add(new C5Wolf(1, 1));
 		roles.add(new SaneCop(2));
-		actions = formActionsSet(roles);
-		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), new Self("wolf")));
+		Alignment wolf = new Self("wolf");
+		alignments.put(wolf.getName(), wolf);
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), wolf));;
 		Alignment cops = new Village("cops");
-		pairsToAssign.add(new RoleAlignmentPair(roles.get(1),cops));
+		alignments.put(cops.getName(), cops);
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(1), cops));
+		actions = formActionsSet(roles, alignments.values());
 	}
 	
 	/**Send a message to the text channel this game is taking place in.*/

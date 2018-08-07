@@ -14,14 +14,12 @@ import interfaces.ActionManager;
 public abstract class Alignment implements ActionManager {
 	
 	protected String name;
-	protected static Map<String, Alignment> alignments = new HashMap<String, Alignment>();
 	protected Set<Player> members = new HashSet<Player>();
 	protected Map<String, Action> actions = new HashMap<>();
 	
 	/**Construct an Alignment with name n. Names should be unique.*/
 	public Alignment(String n){
 		name = n;
-		alignments.put(name, this);
 	}
 	
 	@Override
@@ -51,19 +49,6 @@ public abstract class Alignment implements ActionManager {
 	/**Adds Player p to this Alignment.*/
 	public void addPlayer(Player p){
 		members.add(p);
-	}
-	
-	/**Gets the alignment with name n if it exists.*/
-	public static Alignment getAlignment(String n){
-		if(alignments.containsKey(n)){
-			return alignments.get(n);
-		}
-		return null;
-	}
-	
-	/**Returns a Collection containing all alignments in the game.*/
-	public static Collection<Alignment> getAllAlignments(){
-		return alignments.values();
 	}
 	
 	/**Returns if this faction wins this game.*/
