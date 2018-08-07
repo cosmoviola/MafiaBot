@@ -121,6 +121,7 @@ public class Player {
 	/**Prepare this Player for the next day, resetting all necessary fields.*/
 	public void nightReset(){
 		hooked = false;
+		bodyguarded = false;
 		role.reset();
 		resetResults();
 	}
