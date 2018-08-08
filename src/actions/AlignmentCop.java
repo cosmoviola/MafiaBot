@@ -32,10 +32,11 @@ public class AlignmentCop extends SingleTargetableKeywordAction {
 	public void doAction(Game g){
 		String friendlyResult = " is aligned with you.";
 		String hostileResult = " is hostile to you.";
-		if(g.getState().equals(Game.State.NIGHT) && actor.isAlive() && isActive(g)){
+		if(g.getState().equals(Game.State.NIGHT) && actor.isAlive() && isActive(g) && target.isPresent()){
 			if(actor.isHooked()){
 				actor.appendResult("Your cop action failed.");
-			}else target.ifPresent(t -> {
+			}else{
+				Player t = target.get();
 				switch(sanity){
 				case SANE:
 					if(actor.isAligned(t)){
@@ -58,7 +59,7 @@ public class AlignmentCop extends SingleTargetableKeywordAction {
 					actor.appendResult(t.getIdentifier()+hostileResult);
 					break;
 				}
-			});
+			}
 		}
 	}
 

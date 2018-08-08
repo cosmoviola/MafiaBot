@@ -18,10 +18,11 @@ public class Kill extends SingleTargetableKeywordAction {
 
 	@Override
 	public void doAction(Game g) {
-		if(g.getState().equals(Game.State.NIGHT) && actor.isAlive() && isActive(g)){
+		if(g.getState().equals(Game.State.NIGHT) && actor.isAlive() && isActive(g) && target.isPresent()){
 			if(actor.isHooked()){
 				actor.appendResult("Your kill action failed.");
-			}else target.ifPresent(t-> {
+			}else{
+				Player t = target.get();
 				if(t.isBodyguarded()){
 					actor.appendResult("You tried to kill " + g.getCurrentStoredNick(t) + " (ID: " + t.getIdentifier() + "), but they were protected.");
 				}else{
@@ -29,7 +30,7 @@ public class Kill extends SingleTargetableKeywordAction {
 					g.appendChannelResult(g.getCurrentStoredNick(t) + " (ID: " + t.getIdentifier() + ")" + " has been killed. "
 										  + "They were a "+t.getRole().cardFlip()+".");
 				}
-			});
+			}
 		}
 	}
 	

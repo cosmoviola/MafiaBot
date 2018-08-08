@@ -18,12 +18,12 @@ public class Hook extends SingleTargetableKeywordAction {
 
 	@Override
 	public void doAction(Game g) {
-		if(g.getState().equals(Game.State.NIGHT) && actor.isAlive() && isActive(g)){
+		if(g.getState().equals(Game.State.NIGHT) && actor.isAlive() && isActive(g) && target.isPresent()){
 			if(actor.isHooked()){
 				actor.appendResult("Your hook action failed.");
-			}else target.ifPresent(t-> {
-				t.hook();
-			});
+			}else{
+				target.get().hook();
+			}
 		}
 	}
 

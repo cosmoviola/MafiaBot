@@ -22,6 +22,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import actions.Action;
 import alignments.Alignment;
+import alignments.Mafia;
 import alignments.Self;
 import alignments.Village;
 import interfaces.ActionManager;
@@ -45,7 +46,7 @@ public class Game {
 	private List<Role> roles = new ArrayList<>(); //contains roles for the game
 	private List<Action> actions;
 	private List<RoleAlignmentPair> pairsToAssign = new ArrayList<>(); //these are to be assigned to players
-	private int GAME_SIZE = 2;
+	private int GAME_SIZE = 3;
 	private ScheduledThreadPoolExecutor timerExecutor = new ScheduledThreadPoolExecutor(1);
 	private ScheduledFuture currentTimer;
 	private Map<User, Vote> votes = new HashMap<>(); //key is the voter, value is that user's vote
@@ -215,11 +216,10 @@ public class Game {
 		cancelTimer();
 		//role assignment
 		living = new HashSet<Player>(getPlayers());
-		twoPlayerTestRoles();
+		threePlayerTestRoles();
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(getPlayers());
 		Collections.shuffle(shufflePlayers);
 		String playersMessage = "The players are: " + formValidTargetsString(getPlayers());
-		CompletableFuture<Boolean>[] messageFutures = new CompletableFuture[GAME_SIZE];
 		for(int i=0; i<GAME_SIZE; i++){
 			RoleAlignmentPair pair = pairsToAssign.get(i);
 			Role r = pair.getRole();
@@ -229,8 +229,13 @@ public class Game {
 			p.setAlignment(a);
 			r.setActor(p);
 			a.addPlayer(p);
-			messageFutures[i] = p.privateMessage(r.roleMessage() + "\n" + a.alignmentString(this) + "\n" + a.winCondition());
 			System.out.println(p.getIdentifier()+" "+r.getClass().getName());
+		}
+		CompletableFuture<Boolean>[] messageFutures = new CompletableFuture[GAME_SIZE];
+		for(int i = 0; i < GAME_SIZE; i++){
+			Player p = shufflePlayers.get(i);
+			Alignment a = p.getAlignment();
+			messageFutures[i] = p.privateMessage(p.getRole().roleMessage() + "\n" + a.alignmentString(this) + "\n" + a.winCondition());
 		}
 		try{
 			CompletableFuture.allOf(messageFutures).join();
@@ -559,7 +564,6 @@ public class Game {
 		}
 		if(executorRole.getCommands().contains(keyword)){
 			if(executorRole.isActive(keyword, this)){
-				
 				if(IDLE_ACTION_STRINGS.contains(targetStr)){
 					executorRole.setTarget(keyword, executor, Optional.empty());
 					executor.privateMessage("You are idling your action.");
@@ -595,8 +599,8 @@ public class Game {
 		for(ActionManager r : roles){
 			result.addAll(r.getActions());
 		}
-		for(ActionManager r : roles){
-			result.addAll(r.getActions());
+		for(ActionManager a : alignments){
+			result.addAll(a.getActions());
 		}
 		result.sort((Action a1, Action a2) -> {
 			return Integer.compare(a1.getPriority(), a2.getPriority());
@@ -645,6 +649,20 @@ public class Game {
 		actions = formActionsSet(roles, alignments.values());
 	}
 	
+	public void threePlayerTestRoles(){
+		roles.add(new Bodyguard(2));
+		roles.add(new Hooker(1));
+		roles.add(new SaneCop(4));
+		Alignment mafia = new Mafia("mafia", 3);
+		alignments.put(mafia.getName(), mafia);
+		Alignment village = new Village("village");
+		alignments.put(village.getName(), village);
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), village));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(1), mafia));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(2), mafia));
+		actions = formActionsSet(roles, alignments.values());
+	}
+	
 	/**Send a message to the text channel this game is taking place in.*/
 	public void postMessage(String s){
 		if(!s.equals("")){
@@ -676,7 +694,12 @@ public class Game {
 		if(state != State.NIGHT){
 			return false;
 		}
-		return !getPlayers().stream().anyMatch(p -> p.isAlive() && !p.getRole().allTargetsSet(this));
+		for(Player p : getPlayers()){
+			if(p.isAlive() && !(p.getRole().allTargetsSet(this) && p.getAlignment().allTargetsSet(this))){
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	private class RoleAlignmentPair{

@@ -46,13 +46,13 @@ public class Mafia extends Alignment {
 			sb.append(g.getCurrentStoredNick(p) + " (ID: " + p.getIdentifier() + "), ");
 		}
 		sb.delete(sb.length()-2, sb.length());
-		sb.append(".\n Every night, one person on your team may kill one player.");
+		sb.append(".\nEvery night, one person on your team may kill one player.");
 		return sb.toString();
 	}
 
 	@Override
 	public String alignmentMessageForThisNight(Game g) {
-		String beginning = "One person on your team may message me '" + this.getName() + " " + keyword + " <user>' to kill target user.";
+		String beginning = "One person on your team may message me 'team " + keyword + " <user>' to kill target user.";
 		Collection<Player> validTargets = ((Kill) actions.get(keyword)).getValidTargets(g);
 		String targets = g.formValidTargetsString(validTargets);
 		if(targets.equals("")){
