@@ -1,6 +1,7 @@
 package actions;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Function;
 
 import game.Game;
@@ -42,7 +43,10 @@ public class Hook extends SingleTargetableKeywordAction {
 	}
 	
 	/**Returns true iff this role can target the supplied Player.*/
-	public boolean canTarget(Player p){
-		return p.isAlive();
+	public boolean canTarget(String key, Player actor, Optional<Player> target){
+		if(!key.equals(keyword)){
+			return false;
+		}
+		return !target.isPresent() || target.get().isAlive();
 	}
 }

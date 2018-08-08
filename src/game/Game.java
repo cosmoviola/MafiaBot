@@ -573,8 +573,11 @@ public class Game {
 				}else{
 					Optional<User> target = getNamedTarget(targetStr);
 					if(target.isPresent()){
-						executorRole.setTarget(keyword, executor, target.map(t -> players.get(t)));
-						executor.privateMessage("You are targeting "+targetStr+" (Discord ID: "+target.get().getName()+"#"+target.get().getDiscriminator()+").");
+						if(executorRole.setTarget(keyword, executor, target.map(t -> players.get(t)))){
+							executor.privateMessage("You are targeting "+targetStr+" (Discord ID: "+target.get().getName()+"#"+target.get().getDiscriminator()+").");
+						}else{
+							executor.privateMessage("You are not able to target "+targetStr+" (Discord ID: "+target.get().getName()+"#"+target.get().getDiscriminator()+").");
+						}
 						for(Player p : executorRole.getResultRecipients()){
 							if(!p.equals(executor)){
 								p.privateMessage(getCurrentStoredNick(executor) + " (Discord ID: "+executor.getIdentifier()+") is targeting "

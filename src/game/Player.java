@@ -135,4 +135,9 @@ public class Player {
 	public void bodyguard() {
 		bodyguarded = true;
 	}
+	
+	/**Redirect all targets of this player to the supplied player.*/
+	public void redirectTo(Player p){
+		role.redirectTo(p);
+	}
 }

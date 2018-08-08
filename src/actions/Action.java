@@ -26,6 +26,9 @@ public abstract class Action {
 	/**Set the target for the given keyword.*/
 	public abstract void setTarget(String key, Optional<Player> p);
 	
+	/**Returns true iff this keyword can target the supplied actor and target.*/
+	public abstract boolean canTarget(String key, Player actor, Optional<Player> target);
+	
 	/**Get all valid keywords for this action.*/
 	public abstract Set<String> getKeywords();
 	

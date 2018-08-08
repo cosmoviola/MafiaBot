@@ -16,8 +16,8 @@ public interface ActionManager {
 	/**Returns whether the supplied keyword is currently active.*/
 	public boolean isActive(String keyword, Game game);
 
-	/**Set the actor and target for the action with the given keyword.*/
-	public void setTarget(String keyword, Player actor, Optional<Player> target);
+	/**Set the actor and target for the action with the given keyword. Return true iff the actor and target were valid.*/
+	public boolean setTarget(String keyword, Player actor, Optional<Player> target);
 	
 	/**Returns true iff all targets have been set for this night.*/
 	public boolean allTargetsSet(Game g);

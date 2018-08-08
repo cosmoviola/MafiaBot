@@ -28,10 +28,14 @@ public abstract class Role implements ActionManager {
 	}
 	
 	/**Set the target for the action specified by the given keyword.*/
-	public void setTarget(String key, Player actor, Optional<Player> target){
+	public boolean setTarget(String key, Player actor, Optional<Player> target){
 		Action a = actions.get(key);
-		a.setTarget(key, target);
-		a.setActor(actor);
+		if(a.canTarget(key, actor, target)){
+			a.setActor(actor);
+			a.setTarget(key, target);
+			return true;
+		}
+		return false;
 	}
 	
 	/**Returns true iff all targets have been set for this night.*/
@@ -97,6 +101,13 @@ public abstract class Role implements ActionManager {
 		Set<Player> set = new HashSet<Player>();
 		set.add(actor);
 		return set;
+	}
+	
+	/**Sets all targets of this role to the supplied Player.*/
+	public void redirectTo(Player p){
+		for(String key : actions.keySet()){
+			actions.get(key).setTarget(key, Optional.of(p));
+		}
 	}
 	
 }

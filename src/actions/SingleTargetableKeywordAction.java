@@ -23,8 +23,12 @@ public abstract class SingleTargetableKeywordAction extends Action {
 	@Override
 	public void setTarget(String key, Optional<Player> p){
 		if(key.equals(keyword)){
-			target = p;
-			targetSet = true;
+			if(canTarget(key, actor, p)){
+				target = p;
+				targetSet = true;
+			}else{
+				throw new IllegalArgumentException("Provided argument is not a valid target.");
+			}
 		}
 	}
 	
@@ -50,12 +54,12 @@ public abstract class SingleTargetableKeywordAction extends Action {
 	public Collection<Player> getValidTargets(Game g){
 		Collection<Player> targets = new HashSet<>();
 		for(Player p : g.getPlayers()){
-			if(canTarget(p)){
+			if(canTarget(keyword, actor, Optional.of(p))){
 				targets.add(p);
 			}
 		}
 		return targets;
 	}
 	
-	public abstract boolean canTarget(Player p);
+	public abstract boolean canTarget(String key, Player actor, Optional<Player> target);
 }

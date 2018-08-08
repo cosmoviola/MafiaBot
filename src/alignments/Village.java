@@ -31,7 +31,7 @@ public class Village extends Alignment {
 	}
 	
 	@Override
-	public void setTarget(String key, Player actor, Optional<Player> target) {
+	public boolean setTarget(String key, Player actor, Optional<Player> target) {
 		throw new RuntimeException("This alignment does not have any actions.");
 	}
 

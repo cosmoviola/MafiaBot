@@ -11,7 +11,7 @@ public class Bodyguard extends Role {
 
 	@Override
 	public String roleMessage() {
-		return "You are a bodyguard. Every night, you may target a user to protect them from killers.";
+		return "You are a bodyguard. Every night, you may target a user to protect them from killers. You may not target yourself.";
 	}
 
 	@Override

@@ -74,10 +74,14 @@ public abstract class Alignment implements ActionManager {
 	}
 	
 	/**Set the actor and target for the action with the given keyword.*/
-	public void setTarget(String key, Player actor, Optional<Player> target){
+	public boolean setTarget(String key, Player actor, Optional<Player> target){
 		Action a = actions.get(key);
-		a.setTarget(key, target);
-		a.setActor(actor);
+		if(a.canTarget(key, actor, target)){
+			a.setTarget(key, target);
+			a.setActor(actor);
+			return true;
+		}
+		return false;
 	}
 	
 	/**Returns whether the supplied keyword is currently active.*/
