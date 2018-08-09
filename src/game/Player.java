@@ -20,6 +20,7 @@ public class Player {
 	private boolean isAlive = true;
 	private boolean hooked = false;
 	private boolean bodyguarded = false;
+	private boolean safeguarded = false;
 	
 	/**Construct a Player for User u.*/
 	public Player(User u){
@@ -122,6 +123,7 @@ public class Player {
 	public void nightReset(){
 		hooked = false;
 		bodyguarded = false;
+		safeguarded = false;
 		role.reset();
 		resetResults();
 	}
@@ -139,5 +141,15 @@ public class Player {
 	/**Redirect all targets of this player to the supplied player.*/
 	public void redirectTo(Player p){
 		role.redirectTo(p);
+	}
+
+	/**Safeguard this player this cycle.*/
+	public void safeguard() {
+		safeguarded = true;
+	}
+	
+	/**Returns true iff this Player was safeguarded this cycle.*/
+	public boolean isSafeguarded(){
+		return safeguarded;
 	}
 }

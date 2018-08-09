@@ -25,7 +25,7 @@ public class Kill extends SingleTargetableKeywordAction {
 			}else{
 				Player t = target.get();
 				if(t.isBodyguarded()){
-					actor.appendResult("You tried to kill " + g.getCurrentStoredNick(t) + " (ID: " + t.getIdentifier() + "), but they were protected.");
+					actor.appendResult("You tried to use your kill action, but your target was protected.");
 				}else{
 					g.killPlayer(t);
 					g.appendChannelResult(g.getCurrentStoredNick(t) + " (ID: " + t.getIdentifier() + ")" + " has been killed. "

@@ -23,7 +23,12 @@ public class Hook extends SingleTargetableKeywordAction {
 			if(actor.isHooked()){
 				actor.appendResult("Your hook action failed.");
 			}else{
-				target.get().hook();
+				Player t = target.get();
+				if(t.isSafeguarded()){
+					actor.appendResult("You tried to use your hook action, but your target was protected.");
+				}else{
+					target.get().hook();
+				}
 			}
 		}
 	}

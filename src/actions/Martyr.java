@@ -31,7 +31,12 @@ public class Martyr extends SingleTargetableKeywordAction {
 			if(actor.isHooked()){
 				actor.appendResult("Your martyr action failed.");
 			}else{
-				target.get().redirectTo(actor);
+				Player t = target.get();
+				if(t.isSafeguarded()){
+					actor.appendResult("You tried to use your redirect action, but your target was protected.");
+				}else{
+					target.get().redirectTo(actor);
+				}
 			}
 		}
 	}

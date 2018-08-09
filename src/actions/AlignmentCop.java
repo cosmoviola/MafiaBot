@@ -38,27 +38,31 @@ public class AlignmentCop extends SingleTargetableKeywordAction {
 				actor.appendResult("Your cop action failed.");
 			}else{
 				Player t = target.get();
-				switch(sanity){
-				case SANE:
-					if(actor.isAligned(t)){
+				if(t.isSafeguarded()){
+					actor.appendResult("You tried to use your cop action, but your target was protected.");
+				}else{
+					switch(sanity){
+					case SANE:
+						if(actor.isAligned(t)){
+							actor.appendResult(t.getIdentifier()+friendlyResult);
+						}else{
+							actor.appendResult(t.getIdentifier()+hostileResult);
+						}
+						break;
+					case INSANE:
+						if(actor.isAligned(t)){
+							actor.appendResult(t.getIdentifier()+hostileResult);
+						}else{
+							actor.appendResult(t.getIdentifier()+friendlyResult);
+						}
+						break;
+					case NAIVE:
 						actor.appendResult(t.getIdentifier()+friendlyResult);
-					}else{
+						break;
+					case PARANOID:
 						actor.appendResult(t.getIdentifier()+hostileResult);
+						break;
 					}
-					break;
-				case INSANE:
-					if(actor.isAligned(t)){
-						actor.appendResult(t.getIdentifier()+hostileResult);
-					}else{
-						actor.appendResult(t.getIdentifier()+friendlyResult);
-					}
-					break;
-				case NAIVE:
-					actor.appendResult(t.getIdentifier()+friendlyResult);
-					break;
-				case PARANOID:
-					actor.appendResult(t.getIdentifier()+hostileResult);
-					break;
 				}
 			}
 		}

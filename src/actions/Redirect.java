@@ -72,7 +72,12 @@ public class Redirect extends Action {
 			if(actor.isHooked()){
 				actor.appendResult("Your redirect action failed.");
 			}else{
-				from.get().redirectTo(to.get());
+				Player target = from.get();
+				if(target.isSafeguarded()){
+					actor.appendResult("You tried to use your redirect action, but your target was protected.");
+				}else{
+					from.get().redirectTo(to.get());
+				}
 			}
 		}
 	}

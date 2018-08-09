@@ -31,7 +31,12 @@ public class Bodyguard extends SingleTargetableKeywordAction {
 			if(actor.isHooked()){
 				actor.appendResult("Your bodyguard action failed.");
 			}else{
-				target.get().bodyguard();
+				Player t = target.get();
+				if(t.isSafeguarded()){
+					actor.appendResult("You tried to use your bodyguard action, but your target was protected.");
+				}else{
+					target.get().bodyguard();
+				}
 			}
 		}
 	}
