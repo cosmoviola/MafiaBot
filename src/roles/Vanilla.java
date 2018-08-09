@@ -14,7 +14,6 @@ public class Vanilla extends Role {
 
 	@Override
 	public String getTrueName() {
-		// TODO Auto-generated method stub
 		return "Vanilla";
 	}
 

@@ -22,7 +22,7 @@ public class Bodyguard extends SingleTargetableKeywordAction {
 		if(!key.equals(keyword)){
 			return false;
 		}
-		return !target.isPresent() || target.get().isAlive() || target.get().equals(actor);
+		return !target.isPresent() || (target.get().isAlive() && !target.get().equals(actor));
 	}
 
 	@Override
