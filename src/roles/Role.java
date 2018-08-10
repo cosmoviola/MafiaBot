@@ -110,4 +110,8 @@ public abstract class Role implements ActionManager {
 		}
 	}
 	
+	/**Returns how much this role's vote counts for.*/
+	public int voteStrength(){
+		return 1;
+	}
 }

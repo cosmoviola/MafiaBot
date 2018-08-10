@@ -7,15 +7,18 @@ import net.dv8tion.jda.core.entities.User;
 public class Vote {
 	private User vote = null;
 	private boolean voteSet = false;
+	private final Player voter;
 	
-	public Vote(){
+	public Vote(Player p){
 		vote = null;
 		voteSet = false;
+		voter = p;
 	}
 	
-	public Vote(User u){
+	public Vote(Player p, User u){
 		vote = u;
 		voteSet = true;
+		voter = p;
 	}
 	
 	public void setVote(User u){
@@ -39,5 +42,9 @@ public class Vote {
 	
 	public boolean isVoteSet(){
 		return voteSet;
+	}
+	
+	public int getVoteStrength(){
+		return voter.getVoteStrength();
 	}
 }

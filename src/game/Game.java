@@ -345,9 +345,9 @@ public class Game {
 			if(e.isVoteSet()){
 				User u = e.getVote();
 				if(tally.containsKey(u)){
-					tally.put(u, tally.get(u)+1);
+					tally.put(u, tally.get(u)+e.getVoteStrength());
 				}else{
-					tally.put(u, 1);
+					tally.put(u, e.getVoteStrength());
 				}
 			}
 		}
@@ -479,8 +479,8 @@ public class Game {
 	}
 	
 	/**Returns a vote for the either the user represented by the input, no lynch, or an unset vote if the input string is meaningless.*/
-	public Vote getVoteFromTarget(String target){
-		Vote v = new Vote();
+	public Vote getVoteFromTarget(Player p, String target){
+		Vote v = new Vote(p);
 		if(NO_LYNCH_STRINGS.contains(target.replaceAll("\\s", "").toLowerCase())){
 			v.setNoLynch();
 		}else{
@@ -521,8 +521,9 @@ public class Game {
 					break;
 				}
 				String target = String.join(" ", Arrays.copyOfRange(cmd, 2, cmd.length));
-				if(players.get(author).isAlive()){
-					Vote v = getVoteFromTarget(target);
+				Player p = players.get(author);
+				if(p.isAlive()){
+					Vote v = getVoteFromTarget(p, target);
 					if(v.isVoteSet()){
 						placeVote(author, v);
 					}else{

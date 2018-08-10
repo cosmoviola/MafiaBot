@@ -58,6 +58,11 @@ public class Player {
 		return identifier;
 	}
 	
+	/**Return how much this player's lynch vote counts for.*/
+	public int getVoteStrength(){
+		return role.voteStrength();
+	}
+	
 	/**Returns true iff this Player is currently alive.*/
 	public boolean isAlive(){
 		return isAlive;
