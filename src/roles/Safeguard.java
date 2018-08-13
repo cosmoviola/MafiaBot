@@ -4,9 +4,7 @@ public class Safeguard extends Role {
 	
 	public Safeguard(int p) {
 		actions.Safeguard sg = new actions.Safeguard(p, g -> true);
-		for(String key : sg.getKeywords()){
-			actions.put(key, sg);
-		}
+		registerActionKeywords(sg);
 	}
 
 	@Override

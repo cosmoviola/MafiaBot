@@ -6,9 +6,7 @@ public class Hooker extends Role {
 	
 	public Hooker(int p) {
 		Hook hook = new Hook(p, g -> true);
-		for(String key : hook.getKeywords()){
-			actions.put(key, hook);
-		}
+		registerActionKeywords(hook);
 	}
 
 	@Override

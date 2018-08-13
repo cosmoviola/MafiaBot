@@ -114,4 +114,11 @@ public abstract class Role implements ActionManager {
 	public int voteStrength(){
 		return 1;
 	}
+	
+	/**Registers all keywords for the given action in this Role's action map for use by the Player.*/
+	protected final void registerActionKeywords(Action a){
+		for(String key : a.getKeywords()){
+			actions.put(key, a);
+		}
+	}
 }

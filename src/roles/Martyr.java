@@ -4,9 +4,7 @@ public class Martyr extends Role {
 
 	public Martyr(int p) {
 		actions.Martyr martyr = new actions.Martyr(p, g -> true);
-		for(String key : martyr.getKeywords()){
-			actions.put(key, martyr);
-		}
+		registerActionKeywords(martyr);
 	}
 	
 	@Override

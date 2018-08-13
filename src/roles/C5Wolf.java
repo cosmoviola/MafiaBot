@@ -9,12 +9,8 @@ public class C5Wolf extends Role {
 	public C5Wolf(int hookPriority, int killPriority) {
 		Hook hook = new Hook(hookPriority, g -> g.getCycle() == 0);
 		Kill kill = new Kill(killPriority, g -> g.getCycle() != 0);
-		for(String key : hook.getKeywords()){
-			actions.put(key, hook);
-		}
-		for(String key : kill.getKeywords()){
-			actions.put(key, kill);
-		}
+		registerActionKeywords(hook);
+		registerActionKeywords(kill);
 	}
 
 	@Override

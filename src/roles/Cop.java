@@ -6,9 +6,7 @@ public abstract class Cop extends Role {
 
 	public Cop(int p, AlignmentCop.Sanity san) {
 		actions.AlignmentCop cop = new actions.AlignmentCop(p, g -> true, san);
-		for(String key : cop.getKeywords()){
-			actions.put(key, cop);
-		}
+		registerActionKeywords(cop);
 	}
 
 	@Override

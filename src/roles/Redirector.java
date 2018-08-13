@@ -6,9 +6,7 @@ public class Redirector extends Role {
 	
 	public Redirector(int priority){
 		Redirect red = new Redirect(priority, g -> true);
-		for(String key : red.getKeywords()){
-			actions.put(key, red);
-		}
+		registerActionKeywords(red);
 	}
 
 	@Override

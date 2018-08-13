@@ -4,9 +4,7 @@ public class Bodyguard extends Role {
 	
 	public Bodyguard(int p){
 		actions.Bodyguard bg = new actions.Bodyguard(p, g -> true);
-		for(String key : bg.getKeywords()){
-			actions.put(key, bg);
-		}
+		registerActionKeywords(bg);
 	}
 
 	@Override
