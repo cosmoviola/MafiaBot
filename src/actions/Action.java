@@ -23,6 +23,11 @@ public abstract class Action {
 		actor = p;
 	}
 	
+	/**Returns true iff the supplied player is the actor for this action.*/
+	public boolean isActor(Player p){
+		return p.equals(actor);
+	}
+	
 	/**Set the target for the given keyword.*/
 	public abstract void setTarget(String key, Optional<Player> p);
 	

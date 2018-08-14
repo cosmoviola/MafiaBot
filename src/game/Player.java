@@ -1,9 +1,11 @@
 package game;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import actions.Action;
 import alignments.Alignment;
 import net.dv8tion.jda.core.entities.User;
 import roles.Role;
@@ -146,6 +148,13 @@ public class Player {
 	/**Redirect all targets of this player to the supplied player.*/
 	public void redirectTo(Player p){
 		role.redirectTo(p);
+		for(Action a : alignment.getActions()){
+			if(a.isActor(this)){
+				for(String key : a.getKeywords()){
+					a.setTarget(key, Optional.of(p));
+				}
+			}
+		}
 	}
 
 	/**Safeguard this player this cycle.*/
