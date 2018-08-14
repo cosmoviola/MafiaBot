@@ -60,7 +60,8 @@ public abstract class Role implements ActionManager {
 			return initial + "You have no actions to perform tonight.";
 		}
 		StringBuilder message = new StringBuilder(initial);
-		for(Action a : actions.values()){
+		Set<Action> actionsSet = new HashSet<Action>(actions.values());
+		for(Action a : actionsSet){
 			String s = a.actionMessageForThisNight(g);
 			if(!s.equals("")){
 				message.append(s).append("\n");

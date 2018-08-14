@@ -37,6 +37,10 @@ public class Redirect extends Action {
 			if(canTarget(key, actor, p)){
 				from = p;
 				fromSet = true;
+				if(!p.isPresent()){
+					to = p;
+					toSet = true;
+				}
 			}else{
 				throw new IllegalArgumentException("Provided argument is not a valid target.");
 			}
@@ -44,6 +48,10 @@ public class Redirect extends Action {
 			if(canTarget(key, actor, p)){
 				to = p;
 				toSet = true;
+				if(!p.isPresent()){
+					from = p;
+					fromSet = true;
+				}
 			}else{
 				throw new IllegalArgumentException("Provided argument is not a valid target.");
 			}
