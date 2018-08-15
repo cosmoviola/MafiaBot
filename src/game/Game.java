@@ -216,7 +216,7 @@ public class Game {
 		cancelTimer();
 		//role assignment
 		living = new HashSet<Player>(getPlayers());
-		martyrTestRoles();
+		sgTestRoles();
 		ArrayList<Player> shufflePlayers = new ArrayList<Player>(getPlayers());
 		Collections.shuffle(shufflePlayers);
 		String playersMessage = "The players are: " + formValidTargetsString(getPlayers());
@@ -674,6 +674,20 @@ public class Game {
 		roles.add(new Redirector(2));
 		roles.add(new Hooker(1));
 		roles.add(new Martyr(3));
+		Alignment mafia = new Mafia("mafia", 4);
+		alignments.put(mafia.getName(), mafia);
+		Alignment village = new Village("village");
+		alignments.put(village.getName(), village);
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(0), mafia));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(1), village));
+		pairsToAssign.add(new RoleAlignmentPair(roles.get(2), mafia));
+		actions = formActionsSet(roles, alignments.values());
+	}
+	
+	public void sgTestRoles(){
+		roles.add(new Safeguard(1));
+		roles.add(new Hooker(2));
+		roles.add(new Mayor());
 		Alignment mafia = new Mafia("mafia", 4);
 		alignments.put(mafia.getName(), mafia);
 		Alignment village = new Village("village");
